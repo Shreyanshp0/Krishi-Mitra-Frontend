@@ -32,50 +32,52 @@ class CropViewModel(
     val history: StateFlow<List<RecommendationHistoryItem>> = getHistoryUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-    fun updateSoilType(value: String) {
-        _formState.value = _formState.value.copy(soilType = value, soilTypeError = null)
-    }
-
     fun updateSeason(value: String) {
-        _formState.value = _formState.value.copy(season = value, seasonError = null)
+        _formState.value = _formState.value.copy(season = value)
     }
 
-    fun updateTemperature(value: String) {
-        _formState.value = _formState.value.copy(temperature = value, temperatureError = null)
+    fun updateFarmSize(value: String) {
+        _formState.value = _formState.value.copy(farmSize = value)
     }
 
-    fun updateRainfall(value: String) {
-        _formState.value = _formState.value.copy(rainfall = value, rainfallError = null)
+    fun updateSoilType(value: String) {
+        _formState.value = _formState.value.copy(soilType = value)
     }
 
-    fun updateNitrogen(value: String) {
-        _formState.value = _formState.value.copy(nitrogen = value, nitrogenError = null)
+    fun updateSoilFertility(value: String) {
+        _formState.value = _formState.value.copy(soilFertility = value)
     }
 
-    fun updatePhosphorus(value: String) {
-        _formState.value = _formState.value.copy(phosphorus = value, phosphorusError = null)
+    fun updateWaterAvailability(value: String) {
+        _formState.value = _formState.value.copy(waterAvailability = value)
     }
 
-    fun updatePotassium(value: String) {
-        _formState.value = _formState.value.copy(potassium = value, potassiumError = null)
+    fun updateIrrigationSource(value: String) {
+        _formState.value = _formState.value.copy(irrigationSource = value)
+    }
+
+    fun updatePriority(value: String) {
+        _formState.value = _formState.value.copy(priority = value)
+    }
+
+    fun updatePreviousCrop(value: String) {
+        _formState.value = _formState.value.copy(previousCrop = value)
     }
 
     fun submitRecommendation(): Boolean {
         val form = _formState.value
-        val validated = validateForm(form)
-        if (validated.hasErrors) {
-            _formState.value = validated
-            return false
-        }
+        if (!form.isValid) return false
 
+        // For now, mapping new form to existing CropInput if possible, 
+        // or just calling fetch with dummy values for missing legacy fields
         val input = CropInput(
-            soilType = validated.soilType,
-            season = validated.season,
-            temperature = validated.temperature.toInt(),
-            rainfall = validated.rainfall.toInt(),
-            nitrogen = validated.nitrogen.toInt(),
-            phosphorus = validated.phosphorus.toInt(),
-            potassium = validated.potassium.toInt()
+            soilType = form.soilType,
+            season = form.season,
+            temperature = 25, // Dummy or derived
+            rainfall = 100,   // Dummy or derived
+            nitrogen = 50,    // Dummy or derived
+            phosphorus = 50,
+            potassium = 50
         )
 
         fetchRecommendation(input)
@@ -89,7 +91,6 @@ class CropViewModel(
                 is DomainResult.Success -> {
                     _uiState.value = CropUiState.Success(result.data)
                 }
-
                 is DomainResult.Error -> {
                     _uiState.value = CropUiState.Error(result.message, result.isOffline)
                 }
@@ -108,29 +109,11 @@ class CropViewModel(
                 is DomainResult.Success -> {
                     _uiState.value = CropUiState.Success(result.data)
                 }
-
                 is DomainResult.Error -> {
                     _uiState.value = CropUiState.Error(result.message, result.isOffline)
                 }
             }
         }
-    }
-
-    private fun validateForm(state: InputFormState): InputFormState {
-        fun validateNumber(value: String, label: String): String? {
-            val number = value.toIntOrNull() ?: return "$label is required"
-            return if (number < 0) "$label cannot be negative" else null
-        }
-
-        return state.copy(
-            soilTypeError = if (state.soilType.isBlank()) "Select soil type" else null,
-            seasonError = if (state.season.isBlank()) "Select season" else null,
-            temperatureError = validateNumber(state.temperature, "Temperature"),
-            rainfallError = validateNumber(state.rainfall, "Rainfall"),
-            nitrogenError = validateNumber(state.nitrogen, "Nitrogen"),
-            phosphorusError = validateNumber(state.phosphorus, "Phosphorus"),
-            potassiumError = validateNumber(state.potassium, "Potassium")
-        )
     }
 }
 
@@ -153,31 +136,23 @@ class CropViewModelFactory(
 }
 
 data class InputFormState(
-    val soilType: String = "",
     val season: String = "",
-    val temperature: String = "",
-    val rainfall: String = "",
-    val nitrogen: String = "",
-    val phosphorus: String = "",
-    val potassium: String = "",
-    val soilTypeError: String? = null,
-    val seasonError: String? = null,
-    val temperatureError: String? = null,
-    val rainfallError: String? = null,
-    val nitrogenError: String? = null,
-    val phosphorusError: String? = null,
-    val potassiumError: String? = null
+    val farmSize: String = "",
+    val soilType: String = "",
+    val soilFertility: String = "",
+    val waterAvailability: String = "",
+    val irrigationSource: String = "",
+    val priority: String = "",
+    val previousCrop: String = "",
+    val isLoading: Boolean = false
 ) {
-    val hasErrors: Boolean
-        get() = listOf(
-            soilTypeError,
-            seasonError,
-            temperatureError,
-            rainfallError,
-            nitrogenError,
-            phosphorusError,
-            potassiumError
-        ).any { it != null }
+    val isValid: Boolean
+        get() = season.isNotBlank() &&
+                soilType.isNotBlank() &&
+                soilFertility.isNotBlank() &&
+                waterAvailability.isNotBlank() &&
+                irrigationSource.isNotBlank() &&
+                priority.isNotBlank()
 }
 
 sealed interface CropUiState {
@@ -186,5 +161,3 @@ sealed interface CropUiState {
     data class Success(val data: RecommendationResult) : CropUiState
     data class Error(val message: String, val isOffline: Boolean) : CropUiState
 }
-
-

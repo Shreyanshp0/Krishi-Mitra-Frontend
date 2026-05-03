@@ -21,12 +21,18 @@ import com.example.krishimitra.ui.theme.LeafGreen
 fun HomeScreen(
     onStartRecommendation: () -> Unit,
     onOpenUpload: () -> Unit,
-    onOpenHistory: () -> Unit
+    onOpenHistory: () -> Unit,
+    onLogout: () -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Krishi Mitra", color = Color.White, fontWeight = FontWeight.Bold) },
+                actions = {
+                    TextButton(onClick = onLogout) {
+                        Text("Logout", color = Color.White)
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = DeepGreen)
             )
         },

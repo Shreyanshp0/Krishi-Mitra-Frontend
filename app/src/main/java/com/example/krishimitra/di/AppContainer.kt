@@ -2,6 +2,8 @@ package com.example.krishimitra.di
 
 import android.content.Context
 import com.example.krishimitra.BuildConfig
+import com.example.krishimitra.data.auth.AuthApi
+import com.example.krishimitra.data.auth.AuthRepository
 import com.example.krishimitra.data.api.CropApiService
 import com.example.krishimitra.data.local.InMemoryHistoryDataSource
 import com.example.krishimitra.data.network.AndroidNetworkMonitor
@@ -31,13 +33,16 @@ class AppContainer(context: Context) {
         .build()
 
     private val apiService: CropApiService = retrofit.create(CropApiService::class.java)
+    private val authApi: AuthApi = retrofit.create(AuthApi::class.java)
 
     private val historyDataSource = InMemoryHistoryDataSource()
     private val networkMonitor = AndroidNetworkMonitor(context.applicationContext)
     private val repository = CropRepositoryImpl(apiService, historyDataSource, networkMonitor)
+    private val authRepository = AuthRepository(authApi)
 
     val getCropRecommendationUseCase = GetCropRecommendationUseCase(repository)
     val getHistoryUseCase = GetHistoryUseCase(repository)
     val retryRecommendationUseCase = RetryRecommendationUseCase(repository)
+    val authRepo: AuthRepository = authRepository
 }
 

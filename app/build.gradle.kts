@@ -15,7 +15,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField("String", "BASE_URL", "\"https://example.com/\"")
+        buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:5000/\"")
     }
 
     buildTypes {
@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp.logging)
+    implementation(libs.play.services.location)
 
 
     testImplementation(libs.junit)
