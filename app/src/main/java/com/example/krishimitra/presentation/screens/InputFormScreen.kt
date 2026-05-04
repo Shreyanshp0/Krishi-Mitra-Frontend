@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.krishimitra.presentation.viewmodel.CropUiState
 import com.example.krishimitra.presentation.viewmodel.InputFormState
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.LightBeige
@@ -24,7 +25,8 @@ import com.example.krishimitra.ui.Dimensions
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InputFormScreen(
-    uiState: InputFormState,
+    formState: InputFormState,
+    uiState: CropUiState,
     onSeasonChange: (String) -> Unit,
     onSoilTypeChange: (String) -> Unit,
     onSoilFertilityChange: (String) -> Unit,
@@ -34,9 +36,20 @@ fun InputFormScreen(
     onPreviousCropChange: (String) -> Unit,
     onFarmSizeChange: (String) -> Unit,
     onSubmit: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onConsumeError: () -> Unit = {}
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(uiState) {
+        if (uiState is CropUiState.Error) {
+            snackbarHostState.showSnackbar(uiState.message)
+            onConsumeError()
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Farmer Input Form", color = Color.White, fontWeight = FontWeight.Bold) },
@@ -62,15 +75,15 @@ fun InputFormScreen(
                 FormSection(title = "📍 Section 1: Farming Basics") {
                     FarmerDropdown(
                         label = "Season (Required)",
-                        options = listOf("Kharif", "Rabi", "Zaid"),
-                        selectedOption = uiState.season,
+                        options = listOf("Kharif", "Rabi", "Zaid", "Annual"),
+                        selectedOption = formState.season,
                         onOptionSelected = onSeasonChange
                     )
                     Spacer(modifier = Modifier.height(Dimensions.ITEM_SPACING))
                     FarmerDropdown(
-                        label = "Farm Size (Optional)",
+                        label = "Farm Size (Required)",
                         options = listOf("Small", "Medium", "Large"),
-                        selectedOption = uiState.farmSize,
+                        selectedOption = formState.farmSize,
                         onOptionSelected = onFarmSizeChange
                     )
                 }
@@ -81,15 +94,15 @@ fun InputFormScreen(
                 FormSection(title = "🌱 Section 2: Soil Details") {
                     FarmerDropdown(
                         label = "Soil Type (Required)",
-                        options = listOf("Sandy", "Clay", "Loamy", "Black", "Red"),
-                        selectedOption = uiState.soilType,
+                        options = listOf("Alluvial", "Black", "Red", "Laterite", "Arid", "Forest", "Other"),
+                        selectedOption = formState.soilType,
                         onOptionSelected = onSoilTypeChange
                     )
                     Spacer(modifier = Modifier.height(Dimensions.ITEM_SPACING))
                     FarmerDropdown(
                         label = "Soil Fertility (Required)",
                         options = listOf("Low", "Medium", "High"),
-                        selectedOption = uiState.soilFertility,
+                        selectedOption = formState.soilFertility,
                         onOptionSelected = onSoilFertilityChange
                     )
                 }
@@ -106,14 +119,14 @@ fun InputFormScreen(
                     )
                     Spacer(modifier = Modifier.height(Dimensions.SMALL))
                     WaterSelectionRow(
-                        selectedLevel = uiState.waterAvailability,
+                        selectedLevel = formState.waterAvailability,
                         onLevelSelected = onWaterAvailabilityChange
                     )
                     Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
                     FarmerDropdown(
                         label = "Irrigation Source (Required)",
-                        options = listOf("Rain-fed", "Borewell", "Canal", "River"),
-                        selectedOption = uiState.irrigationSource,
+                        options = listOf("Tube Well", "Rainfed", "Canal", "Tank", "Other"),
+                        selectedOption = formState.irrigationSource,
                         onOptionSelected = onIrrigationSourceChange
                     )
                 }
@@ -130,12 +143,12 @@ fun InputFormScreen(
                     )
                     Spacer(modifier = Modifier.height(Dimensions.SMALL))
                     PrioritySelectionGrid(
-                        selectedPriority = uiState.priority,
+                        selectedPriority = formState.priority,
                         onPrioritySelected = onPriorityChange
                     )
                     Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
                     OutlinedTextField(
-                        value = uiState.previousCrop,
+                        value = formState.previousCrop,
                         onValueChange = onPreviousCropChange,
                         label = { Text("Previous Crop (Optional)") },
                         modifier = Modifier.fillMaxWidth(),
@@ -148,7 +161,7 @@ fun InputFormScreen(
             item {
                 Button(
                     onClick = onSubmit,
-                    enabled = uiState.isValid && !uiState.isLoading,
+                    enabled = formState.isValid && uiState !is CropUiState.Loading,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(Dimensions.BUTTON_HEIGHT),
@@ -158,7 +171,7 @@ fun InputFormScreen(
                         disabledContainerColor = Color.Gray
                     )
                 ) {
-                    if (uiState.isLoading) {
+                    if (uiState is CropUiState.Loading) {
                         CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                     } else {
                         Text("Get Recommendation 🌾", fontSize = 18.sp, fontWeight = FontWeight.Bold)
@@ -236,7 +249,7 @@ fun FarmerDropdown(
 
 @Composable
 fun WaterSelectionRow(selectedLevel: String, onLevelSelected: (String) -> Unit) {
-    val levels = listOf("Low 💧", "Medium 💧💧", "High 💧💧💧")
+    val levels = listOf("Low", "Medium", "High")
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(Dimensions.SMALL)
@@ -259,7 +272,7 @@ fun WaterSelectionRow(selectedLevel: String, onLevelSelected: (String) -> Unit) 
 
 @Composable
 fun PrioritySelectionGrid(selectedPriority: String, onPrioritySelected: (String) -> Unit) {
-    val priorities = listOf("High Profit 💰", "Low Risk 🛡️", "Fast Growth ⚡")
+    val priorities = listOf("Profit", "Yield", "Low Maintenance", "Drought Resistant")
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.SMALL)) {
         priorities.forEach { priority ->
             val isSelected = selectedPriority == priority
@@ -287,7 +300,8 @@ fun PrioritySelectionGrid(selectedPriority: String, onPrioritySelected: (String)
 @Composable
 fun InputFormScreenPreview() {
     InputFormScreen(
-        uiState = InputFormState(),
+        formState = InputFormState(),
+        uiState = CropUiState.Idle,
         onSeasonChange = {},
         onSoilTypeChange = {},
         onSoilFertilityChange = {},

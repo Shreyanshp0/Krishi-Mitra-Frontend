@@ -1,13 +1,19 @@
 package com.example.krishimitra.presentation.viewmodel
 
+import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
+import com.example.krishimitra.domain.repository.ShcRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileOutputStream
+import javax.inject.Inject
 
 /**
  * Data model for extracted soil components.
@@ -30,7 +36,11 @@ sealed interface SHCUploadUiState {
     data class Error(val message: String) : SHCUploadUiState
 }
 
-class SHCUploadViewModel : ViewModel() {
+@HiltViewModel
+class SHCUploadViewModel @Inject constructor(
+    private val shcRepository: ShcRepository,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<SHCUploadUiState>(SHCUploadUiState.Idle)
     val uiState: StateFlow<SHCUploadUiState> = _uiState.asStateFlow()
@@ -49,18 +59,25 @@ class SHCUploadViewModel : ViewModel() {
             viewModelScope.launch {
                 _uiState.value = SHCUploadUiState.Processing
                 
-                // Simulate OCR extraction delay
-                delay(2500)
-                
-                // Simulate successful extraction with realistic data
-                _uiState.value = SHCUploadUiState.Success(
-                    ExtractedSoilData(
-                        nitrogen = "Medium",
-                        phosphorus = "Low",
-                        potassium = "High",
-                        ph = "6.8 (Neutral)"
-                    )
-                )
+                try {
+                    val file = uriToFile(context, currentState.uri, currentState.fileName)
+                    val result = shcRepository.uploadShc(file)
+                    
+                    result.onSuccess { data ->
+                        _uiState.value = SHCUploadUiState.Success(
+                            ExtractedSoilData(
+                                nitrogen = data["nitrogen"]?.toString() ?: "",
+                                phosphorus = data["phosphorus"]?.toString() ?: "",
+                                potassium = data["potassium"]?.toString() ?: "",
+                                ph = data["ph"]?.toString() ?: ""
+                            )
+                        )
+                    }.onFailure {
+                        _uiState.value = SHCUploadUiState.Error(it.message ?: "Upload failed")
+                    }
+                } catch (e: Exception) {
+                    _uiState.value = SHCUploadUiState.Error("Failed to process file: ${e.message}")
+                }
             }
         }
     }
@@ -70,9 +87,17 @@ class SHCUploadViewModel : ViewModel() {
     }
 
     fun saveSoilData() {
-        viewModelScope.launch {
-            // Logic to persist data would go here
-            _uiState.value = SHCUploadUiState.Idle
+        // Logic to persist data is now handled by upload
+        _uiState.value = SHCUploadUiState.Idle
+    }
+
+    private fun uriToFile(context: Context, uri: Uri, fileName: String): File {
+        val tempFile = File(context.cacheDir, fileName)
+        context.contentResolver.openInputStream(uri)?.use { input ->
+            FileOutputStream(tempFile).use { output ->
+                input.copyTo(output)
+            }
         }
+        return tempFile
     }
 }

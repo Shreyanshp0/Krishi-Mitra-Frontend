@@ -16,10 +16,24 @@ class AuthInterceptor @Inject constructor(
         val token = runBlocking {
             tokenManager.token.first()
         }
-        val request = chain.request().newBuilder()
+        
+        val originalRequest = chain.request()
+        val requestBuilder = originalRequest.newBuilder()
+        
         token?.let {
-            request.addHeader("Authorization", "Bearer $it")
+            requestBuilder.addHeader("Authorization", "Bearer $it")
         }
-        return chain.proceed(request.build())
+        
+        val response = chain.proceed(requestBuilder.build())
+        
+        if (response.code == 401) {
+            // Token might be invalid or expired
+            runBlocking {
+                tokenManager.deleteToken()
+            }
+            // In a real app, you might want to trigger a logout event here
+        }
+        
+        return response
     }
 }

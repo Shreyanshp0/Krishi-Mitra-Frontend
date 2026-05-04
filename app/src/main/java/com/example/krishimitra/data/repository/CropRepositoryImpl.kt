@@ -1,6 +1,6 @@
 package com.example.krishimitra.data.repository
 
-import com.example.krishimitra.data.api.CropApiService
+import com.example.krishimitra.data.network.api.RecommendApi
 import com.example.krishimitra.data.local.InMemoryHistoryDataSource
 import com.example.krishimitra.data.mapper.toDomain
 import com.example.krishimitra.data.mapper.toDto
@@ -11,10 +11,9 @@ import com.example.krishimitra.domain.model.RecommendationHistoryItem
 import com.example.krishimitra.domain.model.RecommendationResult
 import com.example.krishimitra.domain.repository.CropRepository
 import kotlinx.coroutines.flow.Flow
-import java.io.IOException
 
 class CropRepositoryImpl(
-    private val api: CropApiService,
+    private val api: RecommendApi,
     private val historyDataSource: InMemoryHistoryDataSource,
     private val networkMonitor: NetworkMonitor
 ) : CropRepository {
@@ -33,9 +32,15 @@ class CropRepositoryImpl(
 
         return try {
             val response = api.getRecommendations(input.toDto())
-            val recommendations = response.recommendations.take(3).map { it.toDomain() }
+            
+            // Extract recommendations from the nested data structure
+            val recommendationsList = response.data?.recommendations
+
+            val recommendations = recommendationsList?.take(3)?.map { it.toDomain() } ?: emptyList()
+            
             if (recommendations.isEmpty()) {
-                DomainResult.Error("No recommendation received from server.")
+                val errorMsg = response.message ?: "No recommendation received from server."
+                DomainResult.Error(errorMsg)
             } else {
                 val result = RecommendationResult(
                     recommendations = recommendations,
@@ -45,12 +50,9 @@ class CropRepositoryImpl(
                 saveHistory(input, recommendations)
                 DomainResult.Success(result)
             }
-        } catch (_: IOException) {
-            cachedResult?.let {
-                DomainResult.Success(it.copy(isOffline = true))
-            } ?: DomainResult.Error("Network error. Please retry.", isOffline = true)
-        } catch (ex: Exception) {
-            DomainResult.Error(ex.message ?: "Unexpected error occurred.")
+        } catch (e: Exception) {
+            e.printStackTrace()
+            DomainResult.Error(e.message ?: "Unexpected error occurred.")
         }
     }
 
@@ -72,4 +74,3 @@ class CropRepositoryImpl(
         )
     }
 }
-

@@ -22,6 +22,9 @@ import com.example.krishimitra.presentation.screens.SplashScreen
 import com.example.krishimitra.presentation.screens.UploadScreen
 import com.example.krishimitra.presentation.viewmodel.CropUiState
 import com.example.krishimitra.presentation.viewmodel.CropViewModel
+import com.example.krishimitra.presentation.viewmodel.SHCUploadUiState
+import com.example.krishimitra.presentation.viewmodel.SHCUploadViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun AppNavGraph(
@@ -30,6 +33,14 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController()
 ) {
     val context = LocalContext.current
+    val userProfile by authViewModel.userProfile.collectAsState()
+
+    // Sync user location to cropViewModel
+    LaunchedEffect(userProfile) {
+        userProfile?.let {
+            cropViewModel.setLocation(it.state, it.district)
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -50,9 +61,14 @@ fun AppNavGraph(
                 onLoginClick = {
                     authViewModel.login()
                 },
-                onNavigateSignup = { navController.navigate(AppRoute.Signup.route) },
+                onNavigateSignup = { 
+                    navController.navigate(AppRoute.Signup.route) {
+                        launchSingleTop = true
+                    }
+                },
                 onAuthSuccess = {
                     authViewModel.resetUiState()
+                    authViewModel.fetchUserProfile()
                     navController.navigate(AppRoute.Splash.route) {
                         popUpTo(AppRoute.Login.route) { inclusive = true }
                     }
@@ -64,11 +80,12 @@ fun AppNavGraph(
         composable(AppRoute.Signup.route) {
             val signupForm by authViewModel.signupForm.collectAsState()
             val authUiState by authViewModel.uiState.collectAsState()
+            val states by authViewModel.states.collectAsState()
 
             SignupScreen(
                 formState = signupForm,
                 uiState = authUiState,
-                states = authViewModel.states,
+                states = states,
                 districtOptions = authViewModel.districtsFor(signupForm.state),
                 onFirstNameChange = authViewModel::updateFirstName,
                 onLastNameChange = authViewModel::updateLastName,
@@ -86,8 +103,9 @@ fun AppNavGraph(
                 onNavigateLogin = { navController.popBackStack() },
                 onAuthSuccess = {
                     authViewModel.resetUiState()
+                    authViewModel.fetchUserProfile()
                     navController.navigate(AppRoute.Splash.route) {
-                        popUpTo(AppRoute.Login.route) { inclusive = true }
+                        popUpTo(AppRoute.Signup.route) { inclusive = true }
                     }
                 },
                 onErrorShown = authViewModel::consumeError
@@ -105,18 +123,19 @@ fun AppNavGraph(
         }
 
         // Main Navigation with Bottom Nav (wrapped in MainScreen)
-        val mainScreenContent: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit = {
-            MainScreen(
-                navController = navController,
-                cropViewModel = cropViewModel,
-                onLogout = {
-                    authViewModel.resetUiState()
-                    navController.navigate(AppRoute.Login.route) {
-                        popUpTo(AppRoute.Home.route) { inclusive = true }
-                    }
-                }
-            )
-        }
+         val mainScreenContent: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit = {
+             MainScreen(
+                 navController = navController,
+                 cropViewModel = cropViewModel,
+                 authViewModel = authViewModel,
+                 onLogout = {
+                     authViewModel.resetUiState()
+                     navController.navigate(AppRoute.Login.route) {
+                         popUpTo(AppRoute.Home.route) { inclusive = true }
+                     }
+                 }
+             )
+         }
 
         composable(AppRoute.Home.route, content = mainScreenContent)
         composable(AppRoute.Recommend.route, content = mainScreenContent)
@@ -129,11 +148,15 @@ fun AppNavGraph(
             ModeSelectionScreen(
                 onUploadMode = {
                     cropViewModel.clearResult()
-                    navController.navigate(AppRoute.Upload.route)
+                    navController.navigate(AppRoute.Upload.route) {
+                        launchSingleTop = true
+                    }
                 },
                 onManualMode = {
                     cropViewModel.clearResult()
-                    navController.navigate(AppRoute.InputForm.route)
+                    navController.navigate(AppRoute.InputForm.route) {
+                        launchSingleTop = true
+                    }
                 },
                 onBack = { navController.popBackStack() }
             )
@@ -142,9 +165,11 @@ fun AppNavGraph(
         // Input Flows
         composable(AppRoute.InputForm.route) {
             val formState by cropViewModel.formState.collectAsState()
+            val cropUiState by cropViewModel.uiState.collectAsState()
 
             InputFormScreen(
-                uiState = formState,
+                formState = formState,
+                uiState = cropUiState,
                 onSeasonChange = cropViewModel::updateSeason,
                 onSoilTypeChange = cropViewModel::updateSoilType,
                 onSoilFertilityChange = cropViewModel::updateSoilFertility,
@@ -156,17 +181,46 @@ fun AppNavGraph(
                 onSubmit = {
                     val canProceed = cropViewModel.submitRecommendation()
                     if (canProceed) {
-                        navController.navigate(AppRoute.Loading.route)
+                        navController.navigate(AppRoute.Loading.route) {
+                            launchSingleTop = true
+                        }
                     }
                 },
-                onBack = { navController.popBackStack() }
+                onBack = { navController.popBackStack() },
+                onConsumeError = cropViewModel::clearResult
             )
         }
 
         composable(AppRoute.Upload.route) {
+            val shcViewModel: SHCUploadViewModel = hiltViewModel()
+            val shcUiState by shcViewModel.uiState.collectAsState()
+            
+            // Listen for SHC Success to trigger recommendation
+            LaunchedEffect(shcUiState) {
+                if (shcUiState is SHCUploadUiState.Success) {
+                    val data = (shcUiState as SHCUploadUiState.Success).data
+                    val soilDataMap = mapOf(
+                        "nitrogen" to data.nitrogen,
+                        "phosphorus" to data.phosphorus,
+                        "potassium" to data.potassium,
+                        "ph" to data.ph
+                    )
+                    val canProceed = cropViewModel.submitShcRecommendation(soilDataMap)
+                    if (canProceed) {
+                        navController.navigate(AppRoute.Loading.route) {
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            }
+
             UploadScreen(
                 onBack = { navController.popBackStack() },
-                onNavigateToForm = { navController.navigate(AppRoute.InputForm.route) }
+                onNavigateToForm = { 
+                    navController.navigate(AppRoute.InputForm.route) {
+                        launchSingleTop = true
+                    }
+                }
             )
         }
 
@@ -199,16 +253,19 @@ fun AppNavGraph(
                     cropViewModel.clearResult()
                     navController.navigate(AppRoute.ModeSelection.route) {
                         popUpTo(AppRoute.Result.route) { inclusive = true }
+                        launchSingleTop = true
                     }
                 },
                 onOpenHistory = {
                     navController.navigate(AppRoute.History.route) {
                         popUpTo(AppRoute.Result.route) { inclusive = true }
+                        launchSingleTop = true
                     }
                 },
                 onBackHome = {
                     navController.navigate(AppRoute.Home.route) {
                         popUpTo(AppRoute.Result.route) { inclusive = true }
+                        launchSingleTop = true
                     }
                 }
             )

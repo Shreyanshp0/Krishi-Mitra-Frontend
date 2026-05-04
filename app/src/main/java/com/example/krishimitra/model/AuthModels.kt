@@ -12,7 +12,7 @@ data class VerifyLoginOtpRequest(
 
 // Old models (kept for backward compatibility)
 data class LoginRequest(
-    val phone: String,
+    val email: String,
     val password: String
 )
 

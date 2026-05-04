@@ -30,6 +30,7 @@ import com.example.krishimitra.ui.Dimensions
 
 @Composable
 fun HomeScreen(
+    userName: String = "Farmer",
     onNavigateToRecommend: () -> Unit,
     onNavigateToUpload: () -> Unit,
     onNavigateToHistory: () -> Unit,
@@ -47,7 +48,7 @@ fun HomeScreen(
             // Welcome Section
             Column {
                 Text(
-                    text = "Welcome back, Farmer 👋",
+                    text = "Welcome back, $userName 👋",
                     style = MaterialTheme.typography.headlineMedium,
                     color = DeepGreen,
                     fontWeight = FontWeight.Bold
@@ -129,7 +130,11 @@ private fun ActionCard(item: QuickActionItem, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .height(120.dp)
-            .clickable { item.onClick() },
+            .clickable(
+                enabled = true,
+                onClickLabel = item.title,
+                onClick = item.onClick
+            ),
         shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)

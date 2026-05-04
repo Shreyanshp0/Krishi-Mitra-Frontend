@@ -1,7 +1,9 @@
 package com.example.krishimitra.di
 
-import com.example.krishimitra.data.api.CropApiService
-import com.example.krishimitra.data.auth.AuthApi
+import com.example.krishimitra.data.network.api.AuthApi
+import com.example.krishimitra.data.network.api.LocationApi
+import com.example.krishimitra.data.network.api.RecommendApi
+import com.example.krishimitra.data.network.api.ShcApi
 import com.example.krishimitra.data.network.AuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -61,7 +63,19 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideCropApiService(retrofit: Retrofit): CropApiService {
-        return retrofit.create(CropApiService::class.java)
+    fun provideShcApi(retrofit: Retrofit): ShcApi {
+        return retrofit.create(ShcApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRecommendApi(retrofit: Retrofit): RecommendApi {
+        return retrofit.create(RecommendApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocationApi(retrofit: Retrofit): LocationApi {
+        return retrofit.create(LocationApi::class.java)
     }
 }

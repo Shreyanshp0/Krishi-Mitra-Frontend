@@ -1,5 +1,6 @@
 package com.example.krishimitra.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.krishimitra.domain.model.CropInput
@@ -33,6 +34,14 @@ class CropViewModel @Inject constructor(
 
     val history: StateFlow<List<RecommendationHistoryItem>> = getHistoryUseCase()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
+    // Location should be set before requesting recommendation
+    private val _locationState = MutableStateFlow(LocationState())
+    val locationState: StateFlow<LocationState> = _locationState.asStateFlow()
+
+    fun setLocation(state: String, district: String) {
+        _locationState.value = LocationState(state, district)
+    }
 
     fun updateSeason(value: String) {
         _formState.value = _formState.value.copy(season = value)
@@ -70,14 +79,44 @@ class CropViewModel @Inject constructor(
         val form = _formState.value
         if (!form.isValid) return false
 
+        val location = _locationState.value
+        if (location.state.isBlank() || location.district.isBlank()) {
+            _uiState.value = CropUiState.Error("Please ensure location (state/district) is selected in profile or during signup", false)
+            return false
+        }
+
         val input = CropInput(
+            mode = "manual",
+            state = location.state,
+            district = location.district,
             soilType = form.soilType,
             season = form.season,
-            temperature = 25, 
-            rainfall = 100,   
-            nitrogen = 50,    
-            phosphorus = 50,
-            potassium = 50
+            additionalInputs = mapOf(
+                "fertility" to form.soilFertility,
+                "waterAvailability" to form.waterAvailability,
+                "irrigationSource" to form.irrigationSource,
+                "farmSize" to form.farmSize,
+                "farmerPriority" to form.priority,
+                "previousCrop" to form.previousCrop
+            )
+        )
+
+        fetchRecommendation(input)
+        return true
+    }
+
+    fun submitShcRecommendation(soilData: Map<String, Any?>): Boolean {
+        val location = _locationState.value
+        if (location.state.isBlank() || location.district.isBlank()) {
+            _uiState.value = CropUiState.Error("Location required for recommendation", false)
+            return false
+        }
+
+        val input = CropInput(
+            mode = "shc",
+            state = location.state,
+            district = location.district,
+            additionalInputs = soilData
         )
 
         fetchRecommendation(input)
@@ -105,17 +144,25 @@ class CropViewModel @Inject constructor(
     private fun fetchRecommendation(input: CropInput) {
         _uiState.value = CropUiState.Loading
         viewModelScope.launch {
+            Log.d("API_REQUEST", "Sending recommendation request for mode: ${input.mode}")
             when (val result = getCropRecommendationUseCase(input)) {
                 is DomainResult.Success -> {
+                    Log.d("API_RESPONSE", "Recommendation received successfully")
                     _uiState.value = CropUiState.Success(result.data)
                 }
                 is DomainResult.Error -> {
+                    Log.e("API_ERROR", "Failed to fetch recommendation: ${result.message}")
                     _uiState.value = CropUiState.Error(result.message, result.isOffline)
                 }
             }
         }
     }
 }
+
+data class LocationState(
+    val state: String = "",
+    val district: String = ""
+)
 
 data class InputFormState(
     val season: String = "",
@@ -134,7 +181,8 @@ data class InputFormState(
                 soilFertility.isNotBlank() &&
                 waterAvailability.isNotBlank() &&
                 irrigationSource.isNotBlank() &&
-                priority.isNotBlank()
+                priority.isNotBlank() &&
+                farmSize.isNotBlank()
 }
 
 sealed interface CropUiState {

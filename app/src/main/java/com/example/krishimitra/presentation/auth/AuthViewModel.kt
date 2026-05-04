@@ -5,7 +5,13 @@ import android.location.Geocoder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.krishimitra.data.auth.AuthRepository
-import com.example.krishimitra.domain.model.LocationData
+import com.example.krishimitra.data.local.TokenManager
+import com.example.krishimitra.data.network.api.UserData
+import com.example.krishimitra.domain.repository.LocationRepository
+import com.example.krishimitra.model.AuthResponse
+import com.example.krishimitra.model.LoginRequest
+import com.example.krishimitra.model.SignupRequest
+import com.example.krishimitra.model.VerifySignupOtpRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -21,6 +27,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    private val locationRepository: LocationRepository,
+    private val tokenManager: TokenManager,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
@@ -39,9 +47,49 @@ class AuthViewModel @Inject constructor(
     private val _signupForm = MutableStateFlow(SignupFormState())
     val signupForm: StateFlow<SignupFormState> = _signupForm.asStateFlow()
 
-    val states: List<String> = LocationData.getStates()
+    private val _states = MutableStateFlow<List<String>>(emptyList())
+    val states: StateFlow<List<String>> = _states.asStateFlow()
 
-    fun districtsFor(state: String): List<String> = LocationData.getDistricts(state)
+    private val _districts = MutableStateFlow<List<String>>(emptyList())
+    val districts: StateFlow<List<String>> = _districts.asStateFlow()
+
+    private val _userProfile = MutableStateFlow<UserData?>(null)
+    val userProfile: StateFlow<UserData?> = _userProfile.asStateFlow()
+
+    init {
+        loadStates()
+        fetchUserProfile()
+    }
+
+    fun fetchUserProfile() {
+        viewModelScope.launch {
+            authRepository.getMe().onSuccess { response ->
+                _userProfile.value = response.user
+            }
+        }
+    }
+
+    private fun loadStates() {
+        viewModelScope.launch {
+            locationRepository.getStates().onSuccess {
+                _states.value = it
+            }.onFailure {
+                _uiState.value = AuthUiState.Error("Failed to load states: ${it.message}")
+            }
+        }
+    }
+
+    fun loadDistricts(state: String) {
+        viewModelScope.launch {
+            locationRepository.getDistricts(state).onSuccess {
+                _districts.value = it
+            }.onFailure {
+                _uiState.value = AuthUiState.Error("Failed to load districts: ${it.message}")
+            }
+        }
+    }
+
+    fun districtsFor(state: String): List<String> = _districts.value
 
     fun updateLoginEmail(email: String) {
         _loginForm.value = _loginForm.value.copy(email = email.trim(), emailError = null)
@@ -86,6 +134,7 @@ class AuthViewModel @Inject constructor(
             stateError = null,
             districtError = null
         )
+        loadDistricts(state)
     }
 
     fun updateDistrict(district: String) {
@@ -106,7 +155,7 @@ class AuthViewModel @Inject constructor(
                     val subAdminArea = it.subAdminArea // District
 
                     if (adminArea != null) {
-                        val matchedState = states.find { state -> 
+                        val matchedState = _states.value.find { state -> 
                             state.equals(adminArea, ignoreCase = true) || 
                             adminArea.contains(state, ignoreCase = true) 
                         }
@@ -114,11 +163,18 @@ class AuthViewModel @Inject constructor(
                         matchedState?.let { s ->
                             updateState(s)
                             if (subAdminArea != null) {
-                                val matchedDistrict = districtsFor(s).find { district ->
-                                    district.equals(subAdminArea, ignoreCase = true) ||
-                                    subAdminArea.contains(district, ignoreCase = true)
+                                // We need to wait for districts to load or use the ones we just fetched if we had them
+                                // For now, we'll try to find it in the current list which might be updated by updateState(s)
+                                // but updateState is async (launches a coroutine).
+                                // Better: fetch districts specifically here if needed.
+                                locationRepository.getDistricts(s).onSuccess { dists ->
+                                    _districts.value = dists
+                                    val matchedDistrict = dists.find { district ->
+                                        district.equals(subAdminArea, ignoreCase = true) ||
+                                        subAdminArea.contains(district, ignoreCase = true)
+                                    }
+                                    matchedDistrict?.let { d -> updateDistrict(d) }
                                 }
-                                matchedDistrict?.let { d -> updateDistrict(d) }
                             }
                         }
                     }
@@ -142,11 +198,16 @@ class AuthViewModel @Inject constructor(
 
         _uiState.value = AuthUiState.Loading
         viewModelScope.launch {
-            // In a real production app, we would call the repository here
-            // and handle the token using TokenManager
-            delay(1000)
-            if (validated.rememberMe) saveCredentials(validated.email, validated.password)
-            _uiState.value = AuthUiState.Success
+            val result = authRepository.login(LoginRequest(email = form.email, password = form.password))
+            
+            result.onSuccess { response ->
+                response.token?.let { tokenManager.saveToken(it) }
+                if (validated.rememberMe) saveCredentials(form.email, form.password)
+                fetchUserProfile()
+                _uiState.value = AuthUiState.Success
+            }.onFailure {
+                _uiState.value = AuthUiState.Error(it.message ?: "Login failed")
+            }
         }
     }
 
@@ -179,8 +240,23 @@ class AuthViewModel @Inject constructor(
         _signupForm.value = validated
         if (validated.hasBaseErrors) return
 
-        _signupForm.value = _signupForm.value.copy(otpRequested = true)
-        _uiState.value = AuthUiState.Idle
+        _uiState.value = AuthUiState.Loading
+        viewModelScope.launch {
+            val result = authRepository.signup(SignupRequest(
+                name = "${form.firstName} ${form.lastName}",
+                phone = form.phone,
+                password = form.password,
+                email = form.email,
+                state = form.state,
+                district = form.district
+            ))
+            result.onSuccess {
+                _signupForm.value = _signupForm.value.copy(otpRequested = true)
+                _uiState.value = AuthUiState.Idle
+            }.onFailure {
+                _uiState.value = AuthUiState.Error(it.message ?: "Failed to request OTP")
+            }
+        }
     }
 
     fun verifySignupOtp() {
@@ -193,8 +269,22 @@ class AuthViewModel @Inject constructor(
 
         _uiState.value = AuthUiState.Loading
         viewModelScope.launch {
-            delay(1500)
-            _uiState.value = AuthUiState.Success
+            val result = authRepository.verifyOtp(VerifySignupOtpRequest(
+                phone = form.phone,
+                otp = form.otp,
+                name = "${form.firstName} ${form.lastName}",
+                password = form.password,
+                email = form.email,
+                state = form.state,
+                district = form.district
+            ))
+            result.onSuccess { response ->
+                response.token?.let { tokenManager.saveToken(it) }
+                fetchUserProfile()
+                _uiState.value = AuthUiState.Success
+            }.onFailure {
+                _uiState.value = AuthUiState.Error(it.message ?: "Verification failed")
+            }
         }
     }
 

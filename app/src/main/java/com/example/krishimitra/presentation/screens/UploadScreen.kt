@@ -28,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.krishimitra.presentation.viewmodel.ExtractedSoilData
 import com.example.krishimitra.presentation.viewmodel.SHCUploadUiState
 import com.example.krishimitra.presentation.viewmodel.SHCUploadViewModel
@@ -40,7 +40,7 @@ import com.example.krishimitra.ui.Dimensions
 fun UploadScreen(
     onBack: () -> Unit,
     onNavigateToForm: () -> Unit,
-    viewModel: SHCUploadViewModel = viewModel()
+    viewModel: SHCUploadViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
