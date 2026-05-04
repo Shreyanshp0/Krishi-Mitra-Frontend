@@ -1,11 +1,10 @@
 package com.example.krishimitra.presentation.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
@@ -18,6 +17,9 @@ import com.example.krishimitra.domain.model.RecommendationHistoryItem
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.LightGray
 import com.example.krishimitra.ui.theme.SoilBrown
+import com.example.krishimitra.ui.theme.LightBeige
+import com.example.krishimitra.ui.Dimensions
+import com.example.krishimitra.presentation.navigation.KrishiMitraTopBar
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -26,24 +28,25 @@ import java.util.Locale
 @Composable
 fun HistoryScreen(
     history: List<RecommendationHistoryItem>,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    showTopBar: Boolean = true
 ) {
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("Recent", "Archived")
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("History", color = Color.White, fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DeepGreen)
-            )
+            if (showTopBar) {
+                KrishiMitraTopBar(
+                    title = "History",
+                    showBackButton = true,
+                    onBackClick = onBack
+                )
+            }
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = LightBeige,
+        modifier = modifier
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -85,8 +88,8 @@ fun HistoryScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(20.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    contentPadding = PaddingValues(Dimensions.SCREEN_PADDING),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.CARD_SPACING)
                 ) {
                     items(history) { item ->
                         HistoryCard(item)
@@ -104,13 +107,13 @@ private fun HistoryCard(item: RecommendationHistoryItem) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(Dimensions.MEDIUM),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -148,16 +151,16 @@ private fun HistoryCard(item: RecommendationHistoryItem) {
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(Dimensions.SMALL)
             ) {
                 item.recommendations.take(3).forEach { crop ->
                     Surface(
                         color = DeepGreen.copy(alpha = 0.05f),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
                         modifier = Modifier.weight(1f)
                     ) {
                         Column(
-                            modifier = Modifier.padding(8.dp),
+                            modifier = Modifier.padding(Dimensions.SMALL),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Text(

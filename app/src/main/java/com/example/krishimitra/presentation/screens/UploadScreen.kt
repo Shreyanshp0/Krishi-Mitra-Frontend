@@ -33,6 +33,7 @@ import com.example.krishimitra.presentation.viewmodel.ExtractedSoilData
 import com.example.krishimitra.presentation.viewmodel.SHCUploadUiState
 import com.example.krishimitra.presentation.viewmodel.SHCUploadViewModel
 import com.example.krishimitra.ui.theme.*
+import com.example.krishimitra.ui.Dimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,9 +72,9 @@ fun UploadScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
+                .padding(Dimensions.SCREEN_PADDING),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(Dimensions.CARD_SPACING)
         ) {
             item {
                 Text(
@@ -173,9 +174,9 @@ fun UploadBox(onUploadClick: () -> Unit) {
             .fillMaxWidth()
             .height(200.dp)
             .clickable { onUploadClick() },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -186,9 +187,9 @@ fun UploadBox(onUploadClick: () -> Unit) {
                 imageVector = Icons.Default.CloudUpload,
                 contentDescription = null,
                 tint = DeepGreen,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(Dimensions.ICON_SIZE_LARGE)
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
             Text(
                 "Upload Soil Health Card",
                 style = MaterialTheme.typography.titleMedium,
@@ -200,11 +201,11 @@ fun UploadBox(onUploadClick: () -> Unit) {
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
             Button(
                 onClick = onUploadClick,
                 colors = ButtonDefaults.buttonColors(containerColor = DeepGreen.copy(alpha = 0.1f)),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM)
             ) {
                 Text("Choose File", color = DeepGreen, fontWeight = FontWeight.Bold)
             }

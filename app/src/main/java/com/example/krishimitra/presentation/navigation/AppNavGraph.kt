@@ -1,10 +1,12 @@
 package com.example.krishimitra.presentation.navigation
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -12,10 +14,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.krishimitra.presentation.auth.AuthViewModel
 import com.example.krishimitra.presentation.auth.LoginScreen
 import com.example.krishimitra.presentation.auth.SignupScreen
-import com.example.krishimitra.presentation.screens.HistoryScreen
-import com.example.krishimitra.presentation.screens.HomeScreen
 import com.example.krishimitra.presentation.screens.InputFormScreen
 import com.example.krishimitra.presentation.screens.LoadingScreen
+import com.example.krishimitra.presentation.screens.ModeSelectionScreen
 import com.example.krishimitra.presentation.screens.ResultScreen
 import com.example.krishimitra.presentation.screens.SplashScreen
 import com.example.krishimitra.presentation.screens.UploadScreen
@@ -29,12 +30,13 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController()
 ) {
     val context = LocalContext.current
-    
+
     NavHost(
         navController = navController,
         startDestination = AppRoute.Login.route,
         route = AppRoute.Root.route
     ) {
+        // Auth Screens
         composable(AppRoute.Login.route) {
             val loginForm by authViewModel.loginForm.collectAsState()
             val authUiState by authViewModel.uiState.collectAsState()
@@ -51,7 +53,7 @@ fun AppNavGraph(
                 onNavigateSignup = { navController.navigate(AppRoute.Signup.route) },
                 onAuthSuccess = {
                     authViewModel.resetUiState()
-                    navController.navigate(AppRoute.Home.route) {
+                    navController.navigate(AppRoute.Splash.route) {
                         popUpTo(AppRoute.Login.route) { inclusive = true }
                     }
                 },
@@ -84,7 +86,7 @@ fun AppNavGraph(
                 onNavigateLogin = { navController.popBackStack() },
                 onAuthSuccess = {
                     authViewModel.resetUiState()
-                    navController.navigate(AppRoute.Home.route) {
+                    navController.navigate(AppRoute.Splash.route) {
                         popUpTo(AppRoute.Login.route) { inclusive = true }
                     }
                 },
@@ -102,17 +104,11 @@ fun AppNavGraph(
             )
         }
 
-        composable(AppRoute.Home.route) {
-            HomeScreen(
-                onStartRecommendation = {
-                    cropViewModel.clearResult()
-                    navController.navigate(AppRoute.InputForm.route)
-                },
-                onOpenUpload = {
-                    cropViewModel.clearResult()
-                    navController.navigate(AppRoute.Upload.route)
-                },
-                onOpenHistory = { navController.navigate(AppRoute.History.route) },
+        // Main Navigation with Bottom Nav (wrapped in MainScreen)
+        val mainScreenContent: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit = {
+            MainScreen(
+                navController = navController,
+                cropViewModel = cropViewModel,
                 onLogout = {
                     authViewModel.resetUiState()
                     navController.navigate(AppRoute.Login.route) {
@@ -122,6 +118,28 @@ fun AppNavGraph(
             )
         }
 
+        composable(AppRoute.Home.route, content = mainScreenContent)
+        composable(AppRoute.Recommend.route, content = mainScreenContent)
+        composable(AppRoute.History.route, content = mainScreenContent)
+        composable(AppRoute.Insights.route, content = mainScreenContent)
+        composable(AppRoute.Profile.route, content = mainScreenContent)
+
+        // Mode Selection
+        composable(AppRoute.ModeSelection.route) {
+            ModeSelectionScreen(
+                onUploadMode = {
+                    cropViewModel.clearResult()
+                    navController.navigate(AppRoute.Upload.route)
+                },
+                onManualMode = {
+                    cropViewModel.clearResult()
+                    navController.navigate(AppRoute.InputForm.route)
+                },
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        // Input Flows
         composable(AppRoute.InputForm.route) {
             val formState by cropViewModel.formState.collectAsState()
 
@@ -152,6 +170,7 @@ fun AppNavGraph(
             )
         }
 
+        // Recommendation Flow
         composable(AppRoute.Loading.route) {
             val uiState by cropViewModel.uiState.collectAsState()
 
@@ -172,26 +191,27 @@ fun AppNavGraph(
 
         composable(AppRoute.Result.route) {
             val uiState by cropViewModel.uiState.collectAsState()
-
             val successState = uiState as? CropUiState.Success
+
             ResultScreen(
                 result = successState?.data,
                 onTryAgain = {
-                    navController.navigate(AppRoute.InputForm.route)
+                    cropViewModel.clearResult()
+                    navController.navigate(AppRoute.ModeSelection.route) {
+                        popUpTo(AppRoute.Result.route) { inclusive = true }
+                    }
                 },
-                onOpenHistory = { navController.navigate(AppRoute.History.route) },
+                onOpenHistory = {
+                    navController.navigate(AppRoute.History.route) {
+                        popUpTo(AppRoute.Result.route) { inclusive = true }
+                    }
+                },
                 onBackHome = {
                     navController.navigate(AppRoute.Home.route) {
-                        popUpTo(AppRoute.Home.route) { inclusive = true }
+                        popUpTo(AppRoute.Result.route) { inclusive = true }
                     }
                 }
             )
-        }
-
-        composable(AppRoute.History.route) {
-            val history by cropViewModel.history.collectAsState()
-
-            HistoryScreen(history = history, onBack = { navController.popBackStack() })
         }
     }
 }

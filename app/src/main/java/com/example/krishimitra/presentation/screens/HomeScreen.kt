@@ -1,8 +1,8 @@
 package com.example.krishimitra.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -15,67 +15,126 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.LeafGreen
+import com.example.krishimitra.ui.theme.LightBeige
+import com.example.krishimitra.ui.Dimensions
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    onStartRecommendation: () -> Unit,
+    onOpenRecommend: () -> Unit,
     onOpenUpload: () -> Unit,
     onOpenHistory: () -> Unit,
-    onLogout: () -> Unit
+    onOpenInsights: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Krishi Mitra", color = Color.White, fontWeight = FontWeight.Bold) },
-                actions = {
-                    TextButton(onClick = onLogout) {
-                        Text("Logout", color = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = DeepGreen)
-            )
-        },
-        containerColor = MaterialTheme.colorScheme.background
-    ) { paddingValues ->
-        Column(
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(LightBeige),
+        verticalArrangement = Arrangement.spacedBy(Dimensions.SECTION_SPACING)
+    ) {
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(Dimensions.SCREEN_PADDING),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.SECTION_SPACING)
         ) {
-            // Weather Card with Gradient
-            WeatherCard()
-
-            Text(
-                text = "What would you like to do?",
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontWeight = FontWeight.SemiBold
-            )
-
-            ActionCard(
-                badgeText = "REC",
-                onClick = onStartRecommendation
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                SmallActionCard(
-                    modifier = Modifier.weight(1f),
-                    title = "Upload Data",
-                    badgeText = "UP",
-                    onClick = onOpenUpload
+            // Welcome
+            item {
+                Text(
+                    text = "Welcome back, Farmer 👋",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = DeepGreen,
+                    fontWeight = FontWeight.Bold
                 )
-                SmallActionCard(
-                    modifier = Modifier.weight(1f),
-                    title = "View History",
-                    badgeText = "HIS",
-                    onClick = onOpenHistory
+            }
+
+            // Weather
+            item { WeatherCard() }
+
+            // Quick Actions grid
+            item {
+                Text(
+                    text = "Quick Actions",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = DeepGreen,
+                    fontWeight = FontWeight.SemiBold
                 )
+            }
+
+            item {
+                // two-by-two grid using Row
+                Column(verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
+                        QuickActionCard(
+                            title = "Get Recommendation",
+                            subtitle = "Personalized crops",
+                            onClick = onOpenRecommend,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
+                        QuickActionCard(
+                            title = "Upload Soil Data",
+                            subtitle = "Use SHC to auto-fill",
+                            onClick = onOpenUpload,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
+                        QuickActionCard(
+                            title = "View History",
+                            subtitle = "Past recommendations",
+                            onClick = onOpenHistory,
+                            modifier = Modifier.weight(1f)
+                        )
+                        Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
+                        QuickActionCard(
+                            title = "Agri Insights",
+                            subtitle = "News & prices",
+                            onClick = onOpenInsights,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                }
+            }
+
+            // Recent activity (optional)
+            item {
+                Text(
+                    text = "Recent Activity",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = DeepGreen,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
+
+            item {
+                Card(
+                    shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
+                ) {
+                    Column(modifier = Modifier.padding(Dimensions.MEDIUM)) {
+                        Text("Last recommendation: Wheat • 78%", color = Color.DarkGray)
+                        Spacer(modifier = Modifier.height(Dimensions.SMALL))
+                        Text("Last upload: SHC_2024.pdf", color = Color.DarkGray)
+                    }
+                }
+            }
+
+            // Tip / Advisory
+            item {
+                Card(
+                    shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+                    colors = CardDefaults.cardColors(containerColor = DeepGreen.copy(alpha = 0.05f)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
+                ) {
+                    Column(modifier = Modifier.padding(Dimensions.MEDIUM)) {
+                        Text("Tip: Best crop this season — Maize", fontWeight = FontWeight.Bold, color = DeepGreen)
+                        Spacer(modifier = Modifier.height(Dimensions.SMALL))
+                        Text("Consider NPK fertilizer in low doses for improved yield.", color = Color.DarkGray)
+                    }
+                }
             }
         }
     }
@@ -87,8 +146,8 @@ private fun WeatherCard() {
         modifier = Modifier
             .fillMaxWidth()
             .height(140.dp),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
     ) {
         Box(
             modifier = Modifier
@@ -98,11 +157,11 @@ private fun WeatherCard() {
                         colors = listOf(DeepGreen, LeafGreen)
                     )
                 )
-                .padding(20.dp)
+                .padding(Dimensions.LARGE)
         ) {
             Column(modifier = Modifier.align(Alignment.CenterStart)) {
-                Text("Sunny Day", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text("Perfect time for sowing", color = Color.White.copy(alpha = 0.8f))
+                Text("Sunny Day ☀️", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text("Perfect time for farming", color = Color.White.copy(alpha = 0.8f))
             }
             Text(
                 "32°C",
@@ -116,88 +175,24 @@ private fun WeatherCard() {
 }
 
 @Composable
-private fun ActionCard(
-    badgeText: String,
-    onClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Surface(
-                color = DeepGreen.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.size(56.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = badgeText,
-                        color = DeepGreen,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-            Column {
-                Text(
-                    text = "Get Crop Recommendation",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = "Fill in soil and climate details",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun SmallActionCard(
-    modifier: Modifier = Modifier,
+private fun QuickActionCard(
     title: String,
-    badgeText: String,
-    onClick: () -> Unit
+    subtitle: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.clickable(onClick = onClick),
-        shape = RoundedCornerShape(16.dp),
+        modifier = modifier
+            .height(120.dp)
+            .padding(4.dp),
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION),
+        onClick = onClick
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Surface(
-                color = DeepGreen.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.size(40.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text(
-                        text = badgeText,
-                        color = DeepGreen,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-            Text(text = title, style = MaterialTheme.typography.labelLarge, fontWeight = FontWeight.Bold)
+        Column(modifier = Modifier.padding(Dimensions.MEDIUM), verticalArrangement = Arrangement.spacedBy(Dimensions.SMALL)) {
+            Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = DeepGreen)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
         }
     }
 }

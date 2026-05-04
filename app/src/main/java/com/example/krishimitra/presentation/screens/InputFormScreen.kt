@@ -19,6 +19,7 @@ import com.example.krishimitra.presentation.viewmodel.InputFormState
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.LightBeige
 import com.example.krishimitra.ui.theme.SoilBrown
+import com.example.krishimitra.ui.Dimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,8 +54,8 @@ fun InputFormScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(Dimensions.SCREEN_PADDING),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.CARD_SPACING)
         ) {
             // Section 1: Farming Basics
             item {
@@ -65,7 +66,7 @@ fun InputFormScreen(
                         selectedOption = uiState.season,
                         onOptionSelected = onSeasonChange
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.ITEM_SPACING))
                     FarmerDropdown(
                         label = "Farm Size (Optional)",
                         options = listOf("Small", "Medium", "Large"),
@@ -84,7 +85,7 @@ fun InputFormScreen(
                         selectedOption = uiState.soilType,
                         onOptionSelected = onSoilTypeChange
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.ITEM_SPACING))
                     FarmerDropdown(
                         label = "Soil Fertility (Required)",
                         options = listOf("Low", "Medium", "High"),
@@ -103,12 +104,12 @@ fun InputFormScreen(
                         color = SoilBrown,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.SMALL))
                     WaterSelectionRow(
                         selectedLevel = uiState.waterAvailability,
                         onLevelSelected = onWaterAvailabilityChange
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
                     FarmerDropdown(
                         label = "Irrigation Source (Required)",
                         options = listOf("Rain-fed", "Borewell", "Canal", "River"),
@@ -127,18 +128,18 @@ fun InputFormScreen(
                         color = SoilBrown,
                         fontWeight = FontWeight.Bold
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.SMALL))
                     PrioritySelectionGrid(
                         selectedPriority = uiState.priority,
                         onPrioritySelected = onPriorityChange
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
                     OutlinedTextField(
                         value = uiState.previousCrop,
                         onValueChange = onPreviousCropChange,
                         label = { Text("Previous Crop (Optional)") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM)
                     )
                 }
             }
@@ -150,8 +151,8 @@ fun InputFormScreen(
                     enabled = uiState.isValid && !uiState.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp),
-                    shape = RoundedCornerShape(16.dp),
+                        .height(Dimensions.BUTTON_HEIGHT),
+                    shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = DeepGreen,
                         disabledContainerColor = Color.Gray
@@ -172,12 +173,12 @@ fun InputFormScreen(
 fun FormSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(Dimensions.MEDIUM)
         ) {
             Text(
                 text = title,
@@ -185,7 +186,7 @@ fun FormSection(title: String, content: @Composable ColumnScope.() -> Unit) {
                 color = DeepGreen,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Dimensions.ITEM_SPACING))
             content()
         }
     }
@@ -214,7 +215,7 @@ fun FarmerDropdown(
             modifier = Modifier
                 .fillMaxWidth()
                 .menuAnchor(MenuAnchorType.PrimaryNotEditable),
-            shape = RoundedCornerShape(12.dp)
+            shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM)
         )
         ExposedDropdownMenu(
             expanded = expanded,
@@ -238,7 +239,7 @@ fun WaterSelectionRow(selectedLevel: String, onLevelSelected: (String) -> Unit) 
     val levels = listOf("Low 💧", "Medium 💧💧", "High 💧💧💧")
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.SMALL)
     ) {
         levels.forEach { level ->
             val isSelected = selectedLevel == level
@@ -259,13 +260,13 @@ fun WaterSelectionRow(selectedLevel: String, onLevelSelected: (String) -> Unit) 
 @Composable
 fun PrioritySelectionGrid(selectedPriority: String, onPrioritySelected: (String) -> Unit) {
     val priorities = listOf("High Profit 💰", "Low Risk 🛡️", "Fast Growth ⚡")
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.SMALL)) {
         priorities.forEach { priority ->
             val isSelected = selectedPriority == priority
             OutlinedCard(
                 onClick = { onPrioritySelected(priority) },
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
                 border = BorderStroke(
                     width = if (isSelected) 2.dp else 1.dp,
                     color = if (isSelected) DeepGreen else Color.LightGray
@@ -274,7 +275,7 @@ fun PrioritySelectionGrid(selectedPriority: String, onPrioritySelected: (String)
                     containerColor = if (isSelected) DeepGreen.copy(alpha = 0.1f) else Color.White
                 )
             ) {
-                Box(modifier = Modifier.padding(16.dp), contentAlignment = Alignment.CenterStart) {
+                Box(modifier = Modifier.padding(Dimensions.MEDIUM), contentAlignment = Alignment.CenterStart) {
                     Text(priority, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal)
                 }
             }
