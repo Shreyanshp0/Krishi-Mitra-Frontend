@@ -214,7 +214,7 @@ fun FarmerDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                .menuAnchor(),
             shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM)
         )
         ExposedDropdownMenu(

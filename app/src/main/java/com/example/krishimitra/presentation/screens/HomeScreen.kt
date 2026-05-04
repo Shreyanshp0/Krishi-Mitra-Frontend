@@ -1,15 +1,25 @@
 package com.example.krishimitra.presentation.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -20,122 +30,130 @@ import com.example.krishimitra.ui.Dimensions
 
 @Composable
 fun HomeScreen(
-    onOpenRecommend: () -> Unit,
-    onOpenUpload: () -> Unit,
-    onOpenHistory: () -> Unit,
-    onOpenInsights: () -> Unit,
+    onNavigateToRecommend: () -> Unit,
+    onNavigateToUpload: () -> Unit,
+    onNavigateToHistory: () -> Unit,
+    onNavigateToInsights: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
+    LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .background(LightBeige),
+            .background(LightBeige)
+            .padding(Dimensions.SCREEN_PADDING),
         verticalArrangement = Arrangement.spacedBy(Dimensions.SECTION_SPACING)
     ) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(Dimensions.SCREEN_PADDING),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.SECTION_SPACING)
-        ) {
-            // Welcome
-            item {
+        item {
+            // Welcome Section
+            Column {
                 Text(
                     text = "Welcome back, Farmer 👋",
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = DeepGreen,
                     fontWeight = FontWeight.Bold
                 )
-            }
-
-            // Weather
-            item { WeatherCard() }
-
-            // Quick Actions grid
-            item {
                 Text(
-                    text = "Quick Actions",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = DeepGreen,
-                    fontWeight = FontWeight.SemiBold
+                    text = "Here's what's happening on your farm today.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
                 )
             }
+        }
 
-            item {
-                // two-by-two grid using Row
-                Column(verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
-                        QuickActionCard(
-                            title = "Get Recommendation",
-                            subtitle = "Personalized crops",
-                            onClick = onOpenRecommend,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
-                        QuickActionCard(
-                            title = "Upload Soil Data",
-                            subtitle = "Use SHC to auto-fill",
-                            onClick = onOpenUpload,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
+        item {
+            // Weather Card
+            WeatherCard()
+        }
 
-                    Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
-                        QuickActionCard(
-                            title = "View History",
-                            subtitle = "Past recommendations",
-                            onClick = onOpenHistory,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
-                        QuickActionCard(
-                            title = "Agri Insights",
-                            subtitle = "News & prices",
-                            onClick = onOpenInsights,
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                }
-            }
+        item {
+            Text(
+                text = "Quick Actions",
+                style = MaterialTheme.typography.titleLarge,
+                color = DeepGreen,
+                fontWeight = FontWeight.Bold
+            )
+        }
 
-            // Recent activity (optional)
-            item {
-                Text(
-                    text = "Recent Activity",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = DeepGreen,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
+        item {
+            // Quick Actions Grid
+            QuickActionsGrid(
+                onRecommend = onNavigateToRecommend,
+                onUpload = onNavigateToUpload,
+                onHistory = onNavigateToHistory,
+                onInsights = onNavigateToInsights
+            )
+        }
 
-            item {
-                Card(
-                    shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
-                ) {
-                    Column(modifier = Modifier.padding(Dimensions.MEDIUM)) {
-                        Text("Last recommendation: Wheat • 78%", color = Color.DarkGray)
-                        Spacer(modifier = Modifier.height(Dimensions.SMALL))
-                        Text("Last upload: SHC_2024.pdf", color = Color.DarkGray)
-                    }
-                }
-            }
+        item {
+            // Advisory Card
+            AdvisoryCard()
+        }
+    }
+}
 
-            // Tip / Advisory
-            item {
-                Card(
-                    shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
-                    colors = CardDefaults.cardColors(containerColor = DeepGreen.copy(alpha = 0.05f)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
-                ) {
-                    Column(modifier = Modifier.padding(Dimensions.MEDIUM)) {
-                        Text("Tip: Best crop this season — Maize", fontWeight = FontWeight.Bold, color = DeepGreen)
-                        Spacer(modifier = Modifier.height(Dimensions.SMALL))
-                        Text("Consider NPK fertilizer in low doses for improved yield.", color = Color.DarkGray)
-                    }
-                }
-            }
+@Composable
+private fun QuickActionsGrid(
+    onRecommend: () -> Unit,
+    onUpload: () -> Unit,
+    onHistory: () -> Unit,
+    onInsights: () -> Unit
+) {
+    val actions = listOf(
+        QuickActionItem("Get Recommendation", Icons.Default.Spa, LeafGreen, onRecommend),
+        QuickActionItem("Upload Soil Data", Icons.Default.CloudUpload, DeepGreen, onUpload),
+        QuickActionItem("View History", Icons.Default.History, Color(0xFF8B4513), onHistory),
+        QuickActionItem("Agri Insights", Icons.Default.Analytics, Color(0xFF2E8B57), onInsights)
+    )
+
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
+            ActionCard(actions[0], Modifier.weight(1f))
+            ActionCard(actions[1], Modifier.weight(1f))
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
+            ActionCard(actions[2], Modifier.weight(1f))
+            ActionCard(actions[3], Modifier.weight(1f))
+        }
+    }
+}
+
+data class QuickActionItem(
+    val title: String,
+    val icon: ImageVector,
+    val color: Color,
+    val onClick: () -> Unit
+)
+
+@Composable
+private fun ActionCard(item: QuickActionItem, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .height(120.dp)
+            .clickable { item.onClick() },
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(Dimensions.MEDIUM),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = item.icon,
+                contentDescription = item.title,
+                tint = item.color,
+                modifier = Modifier.size(Dimensions.ICON_SIZE_LARGE)
+            )
+            Spacer(modifier = Modifier.height(Dimensions.SMALL))
+            Text(
+                text = item.title,
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.DarkGray
+            )
         }
     }
 }
@@ -175,24 +193,31 @@ private fun WeatherCard() {
 }
 
 @Composable
-private fun QuickActionCard(
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+private fun AdvisoryCard() {
     Card(
-        modifier = modifier
-            .height(120.dp)
-            .padding(4.dp),
+        modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION),
-        onClick = onClick
+        colors = CardDefaults.cardColors(containerColor = LeafGreen.copy(alpha = 0.1f))
     ) {
-        Column(modifier = Modifier.padding(Dimensions.MEDIUM), verticalArrangement = Arrangement.spacedBy(Dimensions.SMALL)) {
-            Text(title, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = DeepGreen)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+        Row(
+            modifier = Modifier.padding(Dimensions.MEDIUM),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(Icons.Default.Spa, contentDescription = null, tint = DeepGreen)
+            Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
+            Column {
+                Text(
+                    "Daily Tip",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = DeepGreen
+                )
+                Text(
+                    "Rice is best suited for this season in your region.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.DarkGray
+                )
+            }
         }
     }
 }

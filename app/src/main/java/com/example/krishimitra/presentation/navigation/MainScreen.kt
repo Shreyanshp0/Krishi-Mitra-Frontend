@@ -27,8 +27,8 @@ internal fun MainScreen(
     val history by cropViewModel.history.collectAsState()
 
     val screenTitle = when (currentRoute) {
-        AppRoute.Home.route -> "Krishi Mitra"
-        AppRoute.Recommend.route -> "Recommend"
+        AppRoute.Home.route -> "Dashboard"
+        AppRoute.Recommend.route -> "Recommendation"
         AppRoute.History.route -> "History"
         AppRoute.Insights.route -> "Insights"
         AppRoute.Profile.route -> "Profile"
@@ -65,26 +65,16 @@ internal fun MainScreen(
         when (currentRoute) {
             AppRoute.Home.route -> {
                 HomeScreen(
-                    onOpenRecommend = {
-                        cropViewModel.clearResult()
-                        navController.navigate(AppRoute.Recommend.route)
-                    },
-                    onOpenUpload = {
-                        cropViewModel.clearResult()
-                        navController.navigate(AppRoute.Upload.route)
-                    },
-                    onOpenHistory = {
-                        navController.navigate(AppRoute.History.route)
-                    },
-                    onOpenInsights = {
-                        navController.navigate(AppRoute.Insights.route)
-                    },
+                    onNavigateToRecommend = { navController.navigate(AppRoute.Recommend.route) },
+                    onNavigateToUpload = { navController.navigate(AppRoute.Upload.route) },
+                    onNavigateToHistory = { navController.navigate(AppRoute.History.route) },
+                    onNavigateToInsights = { navController.navigate(AppRoute.Insights.route) },
                     modifier = modifier
                 )
             }
 
             AppRoute.Recommend.route -> {
-                com.example.krishimitra.presentation.screens.RecommendScreen(
+                RecommendScreen(
                     onStart = {
                         cropViewModel.clearResult()
                         navController.navigate(AppRoute.ModeSelection.route)
@@ -98,7 +88,7 @@ internal fun MainScreen(
                     history = history,
                     onBack = { /* No back on bottom nav screens */ },
                     modifier = modifier,
-                    showTopBar = false // Managed by MainScreen
+                    showTopBar = false
                 )
             }
 

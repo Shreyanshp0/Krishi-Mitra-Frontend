@@ -1,7 +1,6 @@
 package com.example.krishimitra.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.krishimitra.domain.model.CropInput
 import com.example.krishimitra.domain.model.DomainResult
@@ -10,14 +9,17 @@ import com.example.krishimitra.domain.model.RecommendationResult
 import com.example.krishimitra.domain.usecase.GetCropRecommendationUseCase
 import com.example.krishimitra.domain.usecase.GetHistoryUseCase
 import com.example.krishimitra.domain.usecase.RetryRecommendationUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CropViewModel(
+@HiltViewModel
+class CropViewModel @Inject constructor(
     private val getCropRecommendationUseCase: GetCropRecommendationUseCase,
     getHistoryUseCase: GetHistoryUseCase,
     private val retryRecommendationUseCase: RetryRecommendationUseCase
@@ -68,14 +70,12 @@ class CropViewModel(
         val form = _formState.value
         if (!form.isValid) return false
 
-        // For now, mapping new form to existing CropInput if possible, 
-        // or just calling fetch with dummy values for missing legacy fields
         val input = CropInput(
             soilType = form.soilType,
             season = form.season,
-            temperature = 25, // Dummy or derived
-            rainfall = 100,   // Dummy or derived
-            nitrogen = 50,    // Dummy or derived
+            temperature = 25, 
+            rainfall = 100,   
+            nitrogen = 50,    
             phosphorus = 50,
             potassium = 50
         )
@@ -114,24 +114,6 @@ class CropViewModel(
                 }
             }
         }
-    }
-}
-
-class CropViewModelFactory(
-    private val getCropRecommendationUseCase: GetCropRecommendationUseCase,
-    private val getHistoryUseCase: GetHistoryUseCase,
-    private val retryRecommendationUseCase: RetryRecommendationUseCase
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(CropViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return CropViewModel(
-                getCropRecommendationUseCase = getCropRecommendationUseCase,
-                getHistoryUseCase = getHistoryUseCase,
-                retryRecommendationUseCase = retryRecommendationUseCase
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }
 

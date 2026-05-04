@@ -3,13 +3,11 @@ package com.example.krishimitra.presentation.auth
 import android.content.Context
 import android.location.Geocoder
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.krishimitra.data.auth.AuthRepository
 import com.example.krishimitra.domain.model.LocationData
-import com.example.krishimitra.model.LoginRequest
-import com.example.krishimitra.model.SignupRequest
-import com.example.krishimitra.model.VerifySignupOtpRequest
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,10 +16,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
+import javax.inject.Inject
 
-class AuthViewModel(
+@HiltViewModel
+class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val appContext: Context
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
@@ -46,7 +46,6 @@ class AuthViewModel(
     fun updateLoginEmail(email: String) {
         _loginForm.value = _loginForm.value.copy(email = email.trim(), emailError = null)
     }
-
 
     fun updateLoginPassword(password: String) {
         _loginForm.value = _loginForm.value.copy(password = password, passwordError = null)
@@ -107,7 +106,6 @@ class AuthViewModel(
                     val subAdminArea = it.subAdminArea // District
 
                     if (adminArea != null) {
-                        // Find matching state in our data
                         val matchedState = states.find { state -> 
                             state.equals(adminArea, ignoreCase = true) || 
                             adminArea.contains(state, ignoreCase = true) 
@@ -142,17 +140,10 @@ class AuthViewModel(
         _loginForm.value = validated
         if (validated.hasErrors) return
 
-        // Check for dummy credentials for dev purpose
-        val isDummy = validated.email == "farmer@example.com" && validated.password == "PASS11"
-        if (isDummy) {
-            if (validated.rememberMe) saveCredentials(validated.email, validated.password)
-            _uiState.value = AuthUiState.Success
-            return
-        }
-
         _uiState.value = AuthUiState.Loading
         viewModelScope.launch {
-            // Simulate network call - in real app call authRepository.login(...)
+            // In a real production app, we would call the repository here
+            // and handle the token using TokenManager
             delay(1000)
             if (validated.rememberMe) saveCredentials(validated.email, validated.password)
             _uiState.value = AuthUiState.Success
@@ -188,7 +179,6 @@ class AuthViewModel(
         _signupForm.value = validated
         if (validated.hasBaseErrors) return
 
-        // UI-only: simulate OTP sent
         _signupForm.value = _signupForm.value.copy(otpRequested = true)
         _uiState.value = AuthUiState.Idle
     }
@@ -202,10 +192,8 @@ class AuthViewModel(
         }
 
         _uiState.value = AuthUiState.Loading
-        // In real app, call authRepository.verifySignupOtp(...)
         viewModelScope.launch {
-            // Simulate network call
-            kotlinx.coroutines.delay(1500)
+            delay(1500)
             _uiState.value = AuthUiState.Success
         }
     }
@@ -228,19 +216,6 @@ class AuthViewModel(
 
     private fun validateOtp(otp: String): String? {
         return if (otp.length == 6) null else "Enter 6-digit OTP"
-    }
-}
-
-class AuthViewModelFactory(
-    private val authRepository: AuthRepository,
-    private val appContext: Context
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(AuthViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return AuthViewModel(authRepository, appContext) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }
 

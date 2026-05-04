@@ -19,10 +19,9 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -149,8 +148,8 @@ fun LocationSelector(
     isDetectingLocation: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    var stateExpanded = false
-    var districtExpanded = false
+    var stateExpanded by remember { mutableStateOf(false) }
+    var districtExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier,
@@ -206,7 +205,7 @@ fun LocationSelector(
                 },
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
-                    .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true)
+                    .menuAnchor()
                     .fillMaxWidth()
             )
             ExposedDropdownMenu(
@@ -243,7 +242,7 @@ fun LocationSelector(
                 },
                 shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
-                    .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true)
+                    .menuAnchor()
                     .fillMaxWidth()
             )
             ExposedDropdownMenu(
@@ -263,4 +262,3 @@ fun LocationSelector(
         }
     }
 }
-

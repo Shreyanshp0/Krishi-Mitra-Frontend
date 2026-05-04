@@ -3,12 +3,13 @@ package com.example.krishimitra.data.dto
 import com.google.gson.annotations.SerializedName
 
 data class RecommendRequestDto(
-    @SerializedName("soilType") val soilType: String,
-    @SerializedName("season") val season: String,
-    @SerializedName("temperature") val temperature: Int,
-    @SerializedName("rainfall") val rainfall: Int,
-    @SerializedName("nitrogen") val nitrogen: Int,
-    @SerializedName("phosphorus") val phosphorus: Int,
-    @SerializedName("potassium") val potassium: Int
+    @SerializedName("mode") val mode: String,
+    @SerializedName("location") val location: LocationDto,
+    @SerializedName("soilData") val soilData: Map<String, Any?>? = null,
+    @SerializedName("inputs") val inputs: Map<String, Any?>? = null
 )
 
+data class LocationDto(
+    @SerializedName("state") val state: String,
+    @SerializedName("district") val district: String
+)
