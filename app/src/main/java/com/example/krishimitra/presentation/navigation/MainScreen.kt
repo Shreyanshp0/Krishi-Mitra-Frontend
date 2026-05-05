@@ -10,7 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.krishimitra.presentation.screens.HomeScreen
 import com.example.krishimitra.presentation.screens.RecommendScreen
-import com.example.krishimitra.presentation.screens.InsightsScreen
+import com.example.krishimitra.presentation.screens.ChatScreen
 import com.example.krishimitra.presentation.screens.ProfileScreen
 import com.example.krishimitra.presentation.screens.HistoryScreen
 import com.example.krishimitra.presentation.viewmodel.CropViewModel
@@ -34,7 +34,7 @@ internal fun MainScreen(
         AppRoute.Home.route -> "Dashboard"
         AppRoute.Recommend.route -> "Recommendation"
         AppRoute.History.route -> "History"
-        AppRoute.Insights.route -> "Insights"
+        AppRoute.Insights.route -> "Agri Assistant"
         AppRoute.Profile.route -> "Profile"
         else -> "Krishi Mitra"
     }
@@ -99,6 +99,8 @@ internal fun MainScreen(
             AppRoute.History.route -> {
                 HistoryScreen(
                     history = history,
+                    onDelete = cropViewModel::deleteHistory,
+                    onClearAll = cropViewModel::clearAllHistory,
                     onBack = { /* No back on bottom nav screens */ },
                     modifier = modifier,
                     showTopBar = false
@@ -106,7 +108,11 @@ internal fun MainScreen(
             }
 
             AppRoute.Insights.route -> {
-                InsightsScreen(modifier = modifier)
+                ChatScreen(
+                    userState = userProfile?.state ?: "",
+                    userDistrict = userProfile?.district ?: "",
+                    modifier = modifier
+                )
             }
 
             AppRoute.Profile.route -> {

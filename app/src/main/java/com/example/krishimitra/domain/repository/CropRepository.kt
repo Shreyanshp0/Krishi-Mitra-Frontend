@@ -10,5 +10,7 @@ interface CropRepository {
     suspend fun getRecommendations(input: CropInput): DomainResult<RecommendationResult>
     fun getHistory(): Flow<List<RecommendationHistoryItem>>
     suspend fun retryLastRequest(): DomainResult<RecommendationResult>
+    suspend fun deleteHistoryItem(id: Long)
+    suspend fun clearHistory()
 }
 

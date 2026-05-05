@@ -172,7 +172,7 @@ fun InputFormScreen(
                     )
                 ) {
                     if (uiState is CropUiState.Loading) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(Dimensions.ICON_SIZE_MEDIUM))
                     } else {
                         Text("Get Recommendation 🌾", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
@@ -281,7 +281,7 @@ fun PrioritySelectionGrid(selectedPriority: String, onPrioritySelected: (String)
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
                 border = BorderStroke(
-                    width = if (isSelected) 2.dp else 1.dp,
+                    width = if (isSelected) Dimensions.BORDER_WIDTH_MEDIUM else Dimensions.BORDER_WIDTH_THIN,
                     color = if (isSelected) DeepGreen else Color.LightGray
                 ),
                 colors = CardDefaults.outlinedCardColors(

@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.krishimitra.data.auth.AuthRepository
 import android.util.Log
 import com.example.krishimitra.data.local.TokenManager
+import com.example.krishimitra.data.local.UserProfileManager
 import com.example.krishimitra.data.network.api.UserData
 import com.example.krishimitra.domain.model.WeatherData
 import com.example.krishimitra.domain.repository.LocationRepository
@@ -22,6 +23,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
@@ -33,6 +36,7 @@ class AuthViewModel @Inject constructor(
     private val locationRepository: LocationRepository,
     private val weatherRepository: WeatherRepository,
     private val tokenManager: TokenManager,
+    private val userProfileManager: UserProfileManager,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
@@ -63,16 +67,50 @@ class AuthViewModel @Inject constructor(
     private val _userProfile = MutableStateFlow<UserData?>(null)
     val userProfile: StateFlow<UserData?> = _userProfile.asStateFlow()
 
+    val token = tokenManager.token
+    val rememberMe = tokenManager.rememberMe
+
     init {
         loadStates()
-        fetchUserProfile()
+        // Load user profile from DataStore on app start
+        viewModelScope.launch {
+            userProfileManager.userProfile.collect { savedProfile ->
+                if (savedProfile != null && _userProfile.value == null) {
+                    _userProfile.value = savedProfile
+                    Log.d("AuthViewModel", "Loaded user profile from DataStore: ${savedProfile.name}")
+                }
+            }
+        }
+        // If we have a token, fetch profile to ensure we have the latest data
+        viewModelScope.launch {
+            tokenManager.token.collect { tk ->
+                if (tk != null) {
+                    fetchUserProfile()
+                }
+            }
+        }
     }
 
     fun fetchUserProfile() {
         viewModelScope.launch {
             authRepository.getMe().onSuccess { response ->
-                _userProfile.value = response.user
-                // Optionally fetch weather based on user's location if available
+                val user = response.user
+                if (user != null) {
+                    _userProfile.value = user
+                    // Save user profile to DataStore for offline access and persistence
+                    userProfileManager.saveUserProfile(user)
+                    Log.d("AuthViewModel", "Saved user profile to DataStore: ${user.name}")
+                    // Update user name in token manager if needed
+                    tokenManager.saveSession(
+                        token = tokenManager.token.first() ?: "",
+                        remember = tokenManager.rememberMe.first(),
+                        name = user.name
+                    )
+                }
+            }.onFailure {
+                // If offline, we might want to keep the current profile if it exists
+                // or handle unauthorized error
+                Log.e("AuthViewModel", "Failed to fetch profile: ${it.message}")
             }
         }
     }
@@ -313,13 +351,35 @@ class AuthViewModel @Inject constructor(
             val result = authRepository.login(LoginRequest(email = form.email, password = form.password))
             
             result.onSuccess { response ->
-                response.token?.let { tokenManager.saveToken(it) }
-                if (validated.rememberMe) saveCredentials(form.email, form.password)
+                val token = response.token ?: ""
+                // Save session with user name (temporarily use email if name not in login response)
+                tokenManager.saveSession(
+                    token = token,
+                    remember = validated.rememberMe,
+                    name = "" // Will be updated by fetchUserProfile
+                )
+                
+                if (validated.rememberMe) {
+                    saveCredentials(form.email, form.password)
+                } else {
+                    clearSavedCredentials()
+                }
+                
                 fetchUserProfile()
                 _uiState.value = AuthUiState.Success
             }.onFailure {
                 _uiState.value = AuthUiState.Error(it.message ?: "Login failed")
             }
+        }
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            tokenManager.clearSession()
+            userProfileManager.clearUserProfile()
+            _userProfile.value = null
+            _uiState.value = AuthUiState.Idle
+            Log.d("AuthViewModel", "User logged out and profile cleared")
         }
     }
 
@@ -404,10 +464,15 @@ class AuthViewModel @Inject constructor(
                 val result = authRepository.verifyOtp(request)
                 result.onSuccess { response ->
                     Log.d("Signup", "OTP verified successfully")
-                    response.token?.let { tokenManager.saveToken(it) }
-                    fetchUserProfile()
-                    _uiState.value = AuthUiState.Success
-                }.onFailure {
+                val token = response.token ?: ""
+                tokenManager.saveSession(
+                    token = token,
+                    remember = true, // Default to true for signup
+                    name = "${form.firstName} ${form.lastName}"
+                )
+                fetchUserProfile()
+                _uiState.value = AuthUiState.Success
+            }.onFailure {
                     Log.e("Signup", "Verification failed: ${it.message}")
                     _uiState.value = AuthUiState.Error(it.message ?: "Verification failed")
                 }

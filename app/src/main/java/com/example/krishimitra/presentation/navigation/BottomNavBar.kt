@@ -25,6 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import com.example.krishimitra.ui.Dimensions
+import com.example.krishimitra.ui.theme.DeepGreen
+import com.example.krishimitra.ui.theme.LightGreen
 
 data class BottomNavItem(
     val route: String,
@@ -48,11 +50,9 @@ fun BottomNavBar(
     NavigationBar(
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
-            .background(Color.White),
-        containerColor = Color.White,
-        contentColor = Color.Green,
-        tonalElevation = 8.dp
+            .height(Dimensions.NAV_BAR_HEIGHT),
+        containerColor = Color(0xFFF5F5F5), // Light background
+        tonalElevation = Dimensions.NAV_BAR_ELEVATION
     ) {
         navItems.forEach { item ->
             val isSelected = currentRoute == item.route
@@ -64,25 +64,23 @@ fun BottomNavBar(
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.label,
-                        modifier = Modifier.size(20.dp),
-                        tint = if (isSelected) Color.Green else Color.Gray
+                        modifier = Modifier.size(24.dp)
                     )
                 },
                 label = {
                     Text(
                         text = item.label,
-                        fontSize = 10.sp,
+                        fontSize = 11.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                         maxLines = 1,
-                        softWrap = false,
                         overflow = TextOverflow.Ellipsis
                     )
                 },
                 alwaysShowLabel = true,
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = Color.Green,
-                    selectedTextColor = Color.Green,
-                    indicatorColor = Color.Green.copy(alpha = 0.12f),
+                    selectedIconColor = DeepGreen,
+                    selectedTextColor = DeepGreen,
+                    indicatorColor = LightGreen,
                     unselectedIconColor = Color.Gray,
                     unselectedTextColor = Color.Gray
                 )

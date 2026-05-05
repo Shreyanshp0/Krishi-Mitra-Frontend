@@ -7,17 +7,21 @@ import com.example.krishimitra.data.network.api.RecommendApi
 import com.example.krishimitra.data.network.api.ShcApi
 import com.example.krishimitra.data.network.api.WeatherApi
 import com.example.krishimitra.data.auth.AuthRepository
-import com.example.krishimitra.data.local.InMemoryHistoryDataSource
+import com.example.krishimitra.data.local.HistoryManager
 import com.example.krishimitra.data.network.AndroidNetworkMonitor
 import com.example.krishimitra.data.network.NetworkMonitor
+import com.example.krishimitra.data.repository.ChatRepositoryImpl
 import com.example.krishimitra.data.repository.CropRepositoryImpl
 import com.example.krishimitra.data.repository.LocationRepositoryImpl
 import com.example.krishimitra.data.repository.ShcRepositoryImpl
 import com.example.krishimitra.data.repository.WeatherRepositoryImpl
+import com.example.krishimitra.domain.repository.ChatRepository
 import com.example.krishimitra.domain.repository.CropRepository
 import com.example.krishimitra.domain.repository.LocationRepository
 import com.example.krishimitra.domain.repository.ShcRepository
 import com.example.krishimitra.domain.repository.WeatherRepository
+import com.example.krishimitra.data.network.api.ChatApi
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,8 +35,8 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideHistoryDataSource(): InMemoryHistoryDataSource {
-        return InMemoryHistoryDataSource()
+    fun provideGson(): Gson {
+        return Gson()
     }
 
     @Provides
@@ -45,10 +49,10 @@ object RepositoryModule {
     @Singleton
     fun provideCropRepository(
         api: RecommendApi,
-        historyDataSource: InMemoryHistoryDataSource,
+        historyManager: HistoryManager,
         networkMonitor: NetworkMonitor
     ): CropRepository {
-        return CropRepositoryImpl(api, historyDataSource, networkMonitor)
+        return CropRepositoryImpl(api, historyManager, networkMonitor)
     }
 
     @Provides
@@ -73,5 +77,11 @@ object RepositoryModule {
     @Singleton
     fun provideWeatherRepository(weatherApi: WeatherApi): WeatherRepository {
         return WeatherRepositoryImpl(weatherApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatRepository(chatApi: ChatApi): ChatRepository {
+        return ChatRepositoryImpl(chatApi)
     }
 }

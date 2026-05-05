@@ -19,9 +19,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.example.krishimitra.R
 import com.example.krishimitra.ui.theme.DeepGreen
+import com.example.krishimitra.ui.Dimensions
 import kotlinx.coroutines.delay
 
 @Composable
@@ -40,13 +40,13 @@ fun SplashScreen(onTimeout: () -> Unit) {
             painter = painterResource(id = R.drawable.applogo),
             contentDescription = "App Logo",
             modifier = Modifier
-                .size(180.dp)
+                .size(Dimensions.SPLASH_ICON_SIZE)
                 .clip(CircleShape),
             contentScale = ContentScale.Crop
         )
         
-        Spacer(modifier = Modifier.height(24.dp))
-        
+        Spacer(modifier = Modifier.height(Dimensions.LARGE))
+
         Text(
             text = "Krishi Mitra",
             style = MaterialTheme.typography.headlineLarge,
@@ -58,8 +58,8 @@ fun SplashScreen(onTimeout: () -> Unit) {
             style = MaterialTheme.typography.bodyLarge
         )
         
-        Spacer(modifier = Modifier.height(32.dp))
-        
+        Spacer(modifier = Modifier.height(Dimensions.EXTRA_LARGE))
+
         CircularProgressIndicator(color = DeepGreen)
     }
 }

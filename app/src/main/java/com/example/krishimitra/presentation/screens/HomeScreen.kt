@@ -21,12 +21,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.krishimitra.domain.model.WeatherData
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.LeafGreen
 import com.example.krishimitra.ui.theme.LightBeige
+import com.example.krishimitra.ui.theme.HistoryBrown
+import com.example.krishimitra.ui.theme.InsightGreen
 import com.example.krishimitra.ui.Dimensions
 
 @Composable
@@ -105,8 +109,8 @@ private fun QuickActionsGrid(
     val actions = listOf(
         QuickActionItem("Get Recommendation", Icons.Default.Spa, LeafGreen, onRecommend),
         QuickActionItem("Upload Soil Data", Icons.Default.CloudUpload, DeepGreen, onUpload),
-        QuickActionItem("View History", Icons.Default.History, Color(0xFF8B4513), onHistory),
-        QuickActionItem("Agri Insights", Icons.Default.Analytics, Color(0xFF2E8B57), onInsights)
+        QuickActionItem("View History", Icons.Default.History, HistoryBrown, onHistory),
+        QuickActionItem("Agri Insights", Icons.Default.Analytics, InsightGreen, onInsights)
     )
 
     Column(verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)) {
@@ -132,7 +136,7 @@ data class QuickActionItem(
 private fun ActionCard(item: QuickActionItem, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
-            .height(120.dp)
+            .height(Dimensions.CARD_HEIGHT)
             .clickable(
                 enabled = true,
                 onClickLabel = item.title,
@@ -140,7 +144,7 @@ private fun ActionCard(item: QuickActionItem, modifier: Modifier = Modifier) {
             ),
         shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
     ) {
         Column(
             modifier = Modifier
@@ -160,7 +164,10 @@ private fun ActionCard(item: QuickActionItem, modifier: Modifier = Modifier) {
                 text = item.title,
                 style = MaterialTheme.typography.labelLarge,
                 fontWeight = FontWeight.Bold,
-                color = Color.DarkGray
+                color = Color.DarkGray,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Center
             )
         }
     }

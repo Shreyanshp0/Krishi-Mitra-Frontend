@@ -35,6 +35,8 @@ fun AppNavGraph(
 ) {
     val context = LocalContext.current
     val userProfile by authViewModel.userProfile.collectAsStateWithLifecycle()
+    val token by authViewModel.token.collectAsStateWithLifecycle(initialValue = null)
+    val rememberMe by authViewModel.rememberMe.collectAsStateWithLifecycle(initialValue = false)
 
     // Sync user location to cropViewModel
     LaunchedEffect(userProfile) {
@@ -43,9 +45,24 @@ fun AppNavGraph(
         }
     }
 
+    // Handle session expiration (token becomes null)
+    LaunchedEffect(token) {
+        if (token == null) {
+            val currentRoute = navController.currentBackStackEntry?.destination?.route
+            if (currentRoute != null && 
+                currentRoute != AppRoute.Login.route && 
+                currentRoute != AppRoute.Signup.route && 
+                currentRoute != AppRoute.Splash.route) {
+                navController.navigate(AppRoute.Login.route) {
+                    popUpTo(AppRoute.Root.route) { inclusive = true }
+                }
+            }
+        }
+    }
+
     NavHost(
         navController = navController,
-        startDestination = AppRoute.Login.route,
+        startDestination = AppRoute.Splash.route,
         route = AppRoute.Root.route
     ) {
         // Auth Screens
@@ -119,7 +136,12 @@ fun AppNavGraph(
         composable(AppRoute.Splash.route) {
             SplashScreen(
                 onTimeout = {
-                    navController.navigate(AppRoute.Main.route) {
+                    val destination = if (token != null && rememberMe) {
+                        AppRoute.Main.route
+                    } else {
+                        AppRoute.Login.route
+                    }
+                    navController.navigate(destination) {
                         popUpTo(AppRoute.Splash.route) { inclusive = true }
                     }
                 }
@@ -137,7 +159,7 @@ fun AppNavGraph(
                     cropViewModel = cropViewModel,
                     authViewModel = authViewModel,
                     onLogout = {
-                        authViewModel.resetUiState()
+                        authViewModel.logout()
                         navController.navigate(AppRoute.Login.route) {
                             popUpTo(AppRoute.Main.route) { inclusive = true }
                         }

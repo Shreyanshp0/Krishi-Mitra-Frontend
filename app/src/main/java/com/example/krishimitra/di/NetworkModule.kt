@@ -1,6 +1,7 @@
 package com.example.krishimitra.di
 
 import com.example.krishimitra.data.network.api.AuthApi
+import com.example.krishimitra.data.network.api.ChatApi
 import com.example.krishimitra.data.network.api.LocationApi
 import com.example.krishimitra.data.network.api.RecommendApi
 import com.example.krishimitra.data.network.api.ShcApi
@@ -84,5 +85,11 @@ object NetworkModule {
     @Singleton
     fun provideWeatherApi(retrofit: Retrofit): WeatherApi {
         return retrofit.create(WeatherApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatApi(retrofit: Retrofit): ChatApi {
+        return retrofit.create(ChatApi::class.java)
     }
 }

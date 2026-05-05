@@ -1,7 +1,7 @@
 package com.example.krishimitra.data.repository
 
 import com.example.krishimitra.data.network.api.RecommendApi
-import com.example.krishimitra.data.local.InMemoryHistoryDataSource
+import com.example.krishimitra.data.local.HistoryManager
 import com.example.krishimitra.data.mapper.toDomain
 import com.example.krishimitra.data.mapper.toDto
 import com.example.krishimitra.data.network.NetworkMonitor
@@ -11,15 +11,19 @@ import com.example.krishimitra.domain.model.RecommendationHistoryItem
 import com.example.krishimitra.domain.model.RecommendationResult
 import com.example.krishimitra.domain.repository.CropRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class CropRepositoryImpl(
     private val api: RecommendApi,
-    private val historyDataSource: InMemoryHistoryDataSource,
+    private val historyManager: HistoryManager,
     private val networkMonitor: NetworkMonitor
 ) : CropRepository {
 
     private var lastInput: CropInput? = null
     private var cachedResult: RecommendationResult? = null
+    private val repositoryScope = CoroutineScope(Dispatchers.IO)
 
     override suspend fun getRecommendations(input: CropInput): DomainResult<RecommendationResult> {
         lastInput = input
@@ -56,21 +60,31 @@ class CropRepositoryImpl(
         }
     }
 
-    override fun getHistory(): Flow<List<RecommendationHistoryItem>> = historyDataSource.getHistory()
+    override fun getHistory(): Flow<List<RecommendationHistoryItem>> = historyManager.history
 
     override suspend fun retryLastRequest(): DomainResult<RecommendationResult> {
         val input = lastInput ?: return DomainResult.Error("No previous request to retry.")
         return getRecommendations(input)
     }
 
+    override suspend fun deleteHistoryItem(id: Long) {
+        historyManager.deleteHistoryItem(id)
+    }
+
+    override suspend fun clearHistory() {
+        historyManager.clearHistory()
+    }
+
     private fun saveHistory(input: CropInput, recommendations: List<com.example.krishimitra.domain.model.CropRecommendation>) {
-        historyDataSource.save(
-            RecommendationHistoryItem(
-                id = System.currentTimeMillis(),
-                input = input,
-                recommendations = recommendations,
-                createdAtMillis = System.currentTimeMillis()
+        repositoryScope.launch {
+            historyManager.saveHistoryItem(
+                RecommendationHistoryItem(
+                    id = System.currentTimeMillis(),
+                    input = input,
+                    recommendations = recommendations,
+                    createdAtMillis = System.currentTimeMillis()
+                )
             )
-        )
+        }
     }
 }

@@ -10,6 +10,8 @@ import com.example.krishimitra.domain.model.RecommendationResult
 import com.example.krishimitra.domain.usecase.GetCropRecommendationUseCase
 import com.example.krishimitra.domain.usecase.GetHistoryUseCase
 import com.example.krishimitra.domain.usecase.RetryRecommendationUseCase
+import com.example.krishimitra.domain.usecase.DeleteHistoryUseCase
+import com.example.krishimitra.domain.usecase.ClearHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +25,9 @@ import javax.inject.Inject
 class CropViewModel @Inject constructor(
     private val getCropRecommendationUseCase: GetCropRecommendationUseCase,
     getHistoryUseCase: GetHistoryUseCase,
-    private val retryRecommendationUseCase: RetryRecommendationUseCase
+    private val retryRecommendationUseCase: RetryRecommendationUseCase,
+    private val deleteHistoryUseCase: DeleteHistoryUseCase,
+    private val clearHistoryUseCase: ClearHistoryUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CropUiState>(CropUiState.Idle)
@@ -139,6 +143,18 @@ class CropViewModel @Inject constructor(
 
     fun clearResult() {
         _uiState.value = CropUiState.Idle
+    }
+
+    fun deleteHistory(id: Long) {
+        viewModelScope.launch {
+            deleteHistoryUseCase(id)
+        }
+    }
+
+    fun clearAllHistory() {
+        viewModelScope.launch {
+            clearHistoryUseCase()
+        }
     }
 
     private fun fetchRecommendation(input: CropInput) {

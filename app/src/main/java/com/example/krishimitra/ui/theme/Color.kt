@@ -4,12 +4,14 @@ import androidx.compose.ui.graphics.Color
 
 // Primary (Deep Green)
 val DeepGreen = Color(0xFF2E7D32)
+val LightGreen = Color(0xFFDCEEDB)
 
 // Secondary (Soil Brown)
 val SoilBrown = Color(0xFF6D4C41)
 
 // Accent (Leaf Green)
 val LeafGreen = Color(0xFF66BB6A)
+val DarkLeafGreen = Color(0xFF2E8B57)
 
 // Background (Light Beige)
 val LightBeige = Color(0xFFF5F5DC)
@@ -23,3 +25,9 @@ val Amber = Color(0xFFFFBF00)
 val Red = Color(0xFFD32F2F)
 val LightGray = Color(0xFFBDBDBD)
 val SurfaceVariant = Color(0xFFEFEBE9)
+
+// Accent Colors for Quick Actions
+val HistoryBrown = Color(0xFF8B4513)
+val InsightGreen = Color(0xFF2E8B57)
+val SoilAccent = Color(0xFF916400)
+

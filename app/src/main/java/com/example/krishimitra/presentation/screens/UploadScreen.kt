@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -82,7 +83,7 @@ fun UploadScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = DarkCharcoal,
                     textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = Dimensions.MEDIUM)
                 )
             }
 
@@ -119,12 +120,12 @@ fun UploadScreen(
                         onClick = { viewModel.analyzeSoilData() },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
+                            .height(Dimensions.BUTTON_HEIGHT),
+                        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
                         colors = ButtonDefaults.buttonColors(containerColor = DeepGreen)
                     ) {
                         Icon(Icons.Default.AutoFixHigh, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(Dimensions.SMALL))
                         Text("Analyze Soil Data", fontWeight = FontWeight.Bold)
                     }
                 }
@@ -172,7 +173,7 @@ fun UploadBox(onUploadClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(Dimensions.UPLOAD_BOX_HEIGHT)
             .clickable { onUploadClick() },
         shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -217,19 +218,19 @@ fun UploadBox(onUploadClick: () -> Unit) {
 fun FilePreviewCard(fileName: String, onRemove: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
+                .padding(Dimensions.MEDIUM)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(Icons.Default.Description, contentDescription = null, tint = SoilBrown, modifier = Modifier.size(32.dp))
-            Spacer(modifier = Modifier.width(12.dp))
+            Icon(Icons.Default.Description, contentDescription = null, tint = SoilBrown, modifier = Modifier.size(Dimensions.ICON_SIZE_MEDIUM))
+            Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
             Column(modifier = Modifier.weight(1f)) {
-                Text(fileName, fontWeight = FontWeight.Bold, maxLines = 1)
+                Text(fileName, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text("Ready to analyze", style = MaterialTheme.typography.bodySmall, color = LeafGreen)
             }
             IconButton(onClick = onRemove) {
@@ -244,11 +245,11 @@ fun ProcessingState() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(24.dp),
+            .padding(Dimensions.EXTRA_LARGE),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         CircularProgressIndicator(color = DeepGreen)
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
         Text("Reading your soil data...", fontWeight = FontWeight.Medium, color = DeepGreen)
         Text("This may take a few seconds", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
     }
@@ -258,29 +259,29 @@ fun ProcessingState() {
 fun ExtractedDataCard(data: ExtractedSoilData, onSave: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
         colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(Dimensions.MEDIUM)) {
             Text(
                 "✨ Extracted Soil Data",
                 style = MaterialTheme.typography.titleMedium,
                 color = DeepGreen,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            
+            Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
+
             SoilDataItem(label = "Nitrogen (N)", value = data.nitrogen, icon = Icons.Default.Science)
             SoilDataItem(label = "Phosphorus (P)", value = data.phosphorus, icon = Icons.Default.Science)
             SoilDataItem(label = "Potassium (K)", value = data.potassium, icon = Icons.Default.Science)
             SoilDataItem(label = "Soil pH", value = data.ph, icon = Icons.Default.WaterDrop)
 
-            Spacer(modifier = Modifier.height(24.dp))
-            
+            Spacer(modifier = Modifier.height(Dimensions.EXTRA_LARGE))
+
             Button(
                 onClick = onSave,
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
                 colors = ButtonDefaults.buttonColors(containerColor = DeepGreen)
             ) {
                 Text("Save Soil Data", fontWeight = FontWeight.Bold)
@@ -294,29 +295,29 @@ fun SoilDataItem(label: String, value: String, icon: ImageVector) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = Dimensions.SMALL),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
                 .size(36.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(Dimensions.CORNER_RADIUS_SMALL))
                 .background(LightBeige),
             contentAlignment = Alignment.Center
         ) {
-            Icon(icon, contentDescription = null, tint = SoilBrown, modifier = Modifier.size(20.dp))
+            Icon(icon, contentDescription = null, tint = SoilBrown, modifier = Modifier.size(Dimensions.ICON_SIZE_SMALL))
         }
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
         Text(label, modifier = Modifier.weight(1f), color = DarkCharcoal)
         
         Surface(
             color = if (value.contains("Low", true)) Amber.copy(alpha = 0.2f) else LeafGreen.copy(alpha = 0.2f),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_SMALL)
         ) {
             Text(
                 text = value,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                color = if (value.contains("Low", true)) Color(0xFF916400) else DeepGreen,
+                modifier = Modifier.padding(horizontal = Dimensions.SMALL, vertical = Dimensions.EXTRA_SMALL),
+                color = if (value.contains("Low", true)) SoilAccent else DeepGreen,
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp
             )
@@ -329,21 +330,21 @@ fun ErrorStateView(message: String, onRetry: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = Red.copy(alpha = 0.05f)),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(Dimensions.MEDIUM),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = Red)
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(Dimensions.SMALL))
             Text(
                 text = message,
                 textAlign = TextAlign.Center,
                 color = Red,
                 fontWeight = FontWeight.Medium
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
             Button(
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(containerColor = Red),
