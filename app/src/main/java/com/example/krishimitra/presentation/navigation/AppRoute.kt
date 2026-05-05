@@ -5,6 +5,9 @@ sealed class AppRoute(val route: String) {
     data object Login : AppRoute("login")
     data object Signup : AppRoute("signup")
     data object Splash : AppRoute("splash")
+
+    // Main shell for bottom navigation
+    data object Main : AppRoute("main")
     
     // Main Navigation (Bottom Nav)
     data object Home : AppRoute("home")

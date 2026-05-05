@@ -3,14 +3,15 @@ package com.example.krishimitra.presentation.navigation
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navigation
 import com.example.krishimitra.presentation.auth.AuthViewModel
 import com.example.krishimitra.presentation.auth.LoginScreen
 import com.example.krishimitra.presentation.auth.SignupScreen
@@ -33,7 +34,7 @@ fun AppNavGraph(
     navController: NavHostController = rememberNavController()
 ) {
     val context = LocalContext.current
-    val userProfile by authViewModel.userProfile.collectAsState()
+    val userProfile by authViewModel.userProfile.collectAsStateWithLifecycle()
 
     // Sync user location to cropViewModel
     LaunchedEffect(userProfile) {
@@ -49,17 +50,18 @@ fun AppNavGraph(
     ) {
         // Auth Screens
         composable(AppRoute.Login.route) {
-            val loginForm by authViewModel.loginForm.collectAsState()
-            val authUiState by authViewModel.uiState.collectAsState()
+            val loginViewModel: AuthViewModel = hiltViewModel()
+            val loginForm by loginViewModel.loginForm.collectAsStateWithLifecycle()
+            val authUiState by loginViewModel.uiState.collectAsStateWithLifecycle()
 
             LoginScreen(
                 formState = loginForm,
                 uiState = authUiState,
-                onEmailChange = authViewModel::updateLoginEmail,
-                onPasswordChange = authViewModel::updateLoginPassword,
-                onRememberChange = authViewModel::updateRememberMe,
+                onEmailChange = loginViewModel::updateLoginEmail,
+                onPasswordChange = loginViewModel::updateLoginPassword,
+                onRememberChange = loginViewModel::updateRememberMe,
                 onLoginClick = {
-                    authViewModel.login()
+                    loginViewModel.login()
                 },
                 onNavigateSignup = { 
                     navController.navigate(AppRoute.Signup.route) {
@@ -67,81 +69,88 @@ fun AppNavGraph(
                     }
                 },
                 onAuthSuccess = {
-                    authViewModel.resetUiState()
-                    authViewModel.fetchUserProfile()
+                    loginViewModel.resetUiState()
+                    loginViewModel.fetchUserProfile()
                     navController.navigate(AppRoute.Splash.route) {
                         popUpTo(AppRoute.Login.route) { inclusive = true }
                     }
                 },
-                onErrorShown = authViewModel::consumeError
+                onErrorShown = loginViewModel::consumeError
             )
         }
 
         composable(AppRoute.Signup.route) {
-            val signupForm by authViewModel.signupForm.collectAsState()
-            val authUiState by authViewModel.uiState.collectAsState()
-            val states by authViewModel.states.collectAsState()
+            val signupViewModel: AuthViewModel = hiltViewModel()
+            val signupForm by signupViewModel.signupForm.collectAsStateWithLifecycle()
+            val authUiState by signupViewModel.uiState.collectAsStateWithLifecycle()
+            val allStates by signupViewModel.allStates.collectAsStateWithLifecycle()
+            val allDistricts by signupViewModel.districts.collectAsStateWithLifecycle()
 
             SignupScreen(
                 formState = signupForm,
                 uiState = authUiState,
-                states = states,
-                districtOptions = authViewModel.districtsFor(signupForm.state),
-                onFirstNameChange = authViewModel::updateFirstName,
-                onLastNameChange = authViewModel::updateLastName,
-                onEmailChange = authViewModel::updateEmail,
-                onPhoneChange = authViewModel::updateSignupPhone,
-                onPasswordChange = authViewModel::updateSignupPassword,
-                onStateChange = authViewModel::updateState,
-                onDistrictChange = authViewModel::updateDistrict,
-                onOtpChange = authViewModel::updateOtp,
+                states = allStates,
+                districtOptions = allDistricts,
+                onFirstNameChange = signupViewModel::updateFirstName,
+                onLastNameChange = signupViewModel::updateLastName,
+                onEmailChange = signupViewModel::updateEmail,
+                onPhoneChange = signupViewModel::updateSignupPhone,
+                onPasswordChange = signupViewModel::updateSignupPassword,
+                onStateChange = signupViewModel::updateState,
+                onDistrictChange = signupViewModel::updateDistrict,
+                onOtpChange = signupViewModel::updateOtp,
                 onLocationDetected = { lat, lon ->
-                    authViewModel.updateLocation(context, lat, lon)
+                    signupViewModel.updateLocation(context, lat, lon)
                 },
-                onSendOtpClick = authViewModel::requestSignupOtp,
-                onVerifyOtpClick = authViewModel::verifySignupOtp,
+                onSendOtpClick = signupViewModel::requestSignupOtp,
+                onVerifyOtpClick = signupViewModel::verifySignupOtp,
                 onNavigateLogin = { navController.popBackStack() },
                 onAuthSuccess = {
-                    authViewModel.resetUiState()
-                    authViewModel.fetchUserProfile()
+                    signupViewModel.resetUiState()
+                    signupViewModel.fetchUserProfile()
                     navController.navigate(AppRoute.Splash.route) {
                         popUpTo(AppRoute.Signup.route) { inclusive = true }
                     }
                 },
-                onErrorShown = authViewModel::consumeError
+                onErrorShown = signupViewModel::consumeError
             )
         }
 
         composable(AppRoute.Splash.route) {
             SplashScreen(
                 onTimeout = {
-                    navController.navigate(AppRoute.Home.route) {
+                    navController.navigate(AppRoute.Main.route) {
                         popUpTo(AppRoute.Splash.route) { inclusive = true }
                     }
                 }
             )
         }
 
-        // Main Navigation with Bottom Nav (wrapped in MainScreen)
-         val mainScreenContent: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit = {
-             MainScreen(
-                 navController = navController,
-                 cropViewModel = cropViewModel,
-                 authViewModel = authViewModel,
-                 onLogout = {
-                     authViewModel.resetUiState()
-                     navController.navigate(AppRoute.Login.route) {
-                         popUpTo(AppRoute.Home.route) { inclusive = true }
-                     }
-                 }
-             )
-         }
+        // Main Navigation with Bottom Nav (nested shell)
+        navigation(
+            route = AppRoute.Main.route,
+            startDestination = AppRoute.Home.route
+        ) {
+            val mainScreenContent: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit = {
+                MainScreen(
+                    navController = navController,
+                    cropViewModel = cropViewModel,
+                    authViewModel = authViewModel,
+                    onLogout = {
+                        authViewModel.resetUiState()
+                        navController.navigate(AppRoute.Login.route) {
+                            popUpTo(AppRoute.Main.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
 
-        composable(AppRoute.Home.route, content = mainScreenContent)
-        composable(AppRoute.Recommend.route, content = mainScreenContent)
-        composable(AppRoute.History.route, content = mainScreenContent)
-        composable(AppRoute.Insights.route, content = mainScreenContent)
-        composable(AppRoute.Profile.route, content = mainScreenContent)
+            composable(AppRoute.Home.route, content = mainScreenContent)
+            composable(AppRoute.Recommend.route, content = mainScreenContent)
+            composable(AppRoute.History.route, content = mainScreenContent)
+            composable(AppRoute.Insights.route, content = mainScreenContent)
+            composable(AppRoute.Profile.route, content = mainScreenContent)
+        }
 
         // Mode Selection
         composable(AppRoute.ModeSelection.route) {
@@ -164,8 +173,8 @@ fun AppNavGraph(
 
         // Input Flows
         composable(AppRoute.InputForm.route) {
-            val formState by cropViewModel.formState.collectAsState()
-            val cropUiState by cropViewModel.uiState.collectAsState()
+            val formState by cropViewModel.formState.collectAsStateWithLifecycle()
+            val cropUiState by cropViewModel.uiState.collectAsStateWithLifecycle()
 
             InputFormScreen(
                 formState = formState,
@@ -193,7 +202,7 @@ fun AppNavGraph(
 
         composable(AppRoute.Upload.route) {
             val shcViewModel: SHCUploadViewModel = hiltViewModel()
-            val shcUiState by shcViewModel.uiState.collectAsState()
+            val shcUiState by shcViewModel.uiState.collectAsStateWithLifecycle()
             
             // Listen for SHC Success to trigger recommendation
             LaunchedEffect(shcUiState) {
@@ -226,7 +235,7 @@ fun AppNavGraph(
 
         // Recommendation Flow
         composable(AppRoute.Loading.route) {
-            val uiState by cropViewModel.uiState.collectAsState()
+            val uiState by cropViewModel.uiState.collectAsStateWithLifecycle()
 
             LaunchedEffect(uiState) {
                 if (uiState is CropUiState.Success) {
@@ -244,7 +253,7 @@ fun AppNavGraph(
         }
 
         composable(AppRoute.Result.route) {
-            val uiState by cropViewModel.uiState.collectAsState()
+            val uiState by cropViewModel.uiState.collectAsStateWithLifecycle()
             val successState = uiState as? CropUiState.Success
 
             ResultScreen(

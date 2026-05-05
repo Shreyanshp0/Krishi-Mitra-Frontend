@@ -5,9 +5,12 @@ import android.location.Geocoder
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.krishimitra.data.auth.AuthRepository
+import android.util.Log
 import com.example.krishimitra.data.local.TokenManager
 import com.example.krishimitra.data.network.api.UserData
+import com.example.krishimitra.domain.model.WeatherData
 import com.example.krishimitra.domain.repository.LocationRepository
+import com.example.krishimitra.domain.repository.WeatherRepository
 import com.example.krishimitra.model.AuthResponse
 import com.example.krishimitra.model.LoginRequest
 import com.example.krishimitra.model.SignupRequest
@@ -28,12 +31,16 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val locationRepository: LocationRepository,
+    private val weatherRepository: WeatherRepository,
     private val tokenManager: TokenManager,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Idle)
     val uiState: StateFlow<AuthUiState> = _uiState.asStateFlow()
+
+    private val _weatherState = MutableStateFlow<WeatherData?>(null)
+    val weatherState: StateFlow<WeatherData?> = _weatherState.asStateFlow()
 
     private val prefs = appContext.getSharedPreferences("krishi_auth", Context.MODE_PRIVATE)
 
@@ -47,10 +54,10 @@ class AuthViewModel @Inject constructor(
     private val _signupForm = MutableStateFlow(SignupFormState())
     val signupForm: StateFlow<SignupFormState> = _signupForm.asStateFlow()
 
-    private val _states = MutableStateFlow<List<String>>(emptyList())
-    val states: StateFlow<List<String>> = _states.asStateFlow()
+    private val _states = MutableStateFlow(listOf<String>())
+    val allStates: StateFlow<List<String>> = _states.asStateFlow()
 
-    private val _districts = MutableStateFlow<List<String>>(emptyList())
+    private val _districts = MutableStateFlow(listOf<String>())
     val districts: StateFlow<List<String>> = _districts.asStateFlow()
 
     private val _userProfile = MutableStateFlow<UserData?>(null)
@@ -65,16 +72,34 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             authRepository.getMe().onSuccess { response ->
                 _userProfile.value = response.user
+                // Optionally fetch weather based on user's location if available
             }
         }
     }
 
+    fun fetchWeather(lat: Double, lon: Double) {
+        viewModelScope.launch {
+            weatherRepository.getWeatherData(lat, lon).onSuccess {
+                _weatherState.value = it
+            }
+        }
+    }
+
+    private val hardcodedLocations = mapOf(
+        "Maharashtra" to listOf("Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad"),
+        "Uttar Pradesh" to listOf("Lucknow", "Kanpur", "Agra", "Varanasi", "Meerut"),
+        "Karnataka" to listOf("Bengaluru", "Mysuru", "Hubballi", "Mangaluru", "Belagavi"),
+        "Tamil Nadu" to listOf("Chennai", "Coimbatore", "Madurai", "Salem", "Tiruchirappalli"),
+        "Gujarat" to listOf("Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar")
+    )
+
     private fun loadStates() {
         viewModelScope.launch {
             locationRepository.getStates().onSuccess {
-                _states.value = it
+                _states.value = it.ifEmpty { hardcodedLocations.keys.toList() }
             }.onFailure {
-                _uiState.value = AuthUiState.Error("Failed to load states: ${it.message}")
+                _states.value = hardcodedLocations.keys.toList()
+                _uiState.value = AuthUiState.Error("Failed to load states: ${it.message}. Using offline data.")
             }
         }
     }
@@ -82,9 +107,10 @@ class AuthViewModel @Inject constructor(
     fun loadDistricts(state: String) {
         viewModelScope.launch {
             locationRepository.getDistricts(state).onSuccess {
-                _districts.value = it
+                _districts.value = it.ifEmpty { hardcodedLocations[state] ?: emptyList() }
             }.onFailure {
-                _uiState.value = AuthUiState.Error("Failed to load districts: ${it.message}")
+                _districts.value = hardcodedLocations[state] ?: emptyList()
+                _uiState.value = AuthUiState.Error("Failed to load districts: ${it.message}. Using offline data.")
             }
         }
     }
@@ -144,43 +170,129 @@ class AuthViewModel @Inject constructor(
     fun updateLocation(context: Context, latitude: Double, longitude: Double) {
         viewModelScope.launch {
             try {
-                val address = withContext(Dispatchers.IO) {
+                val addresses = withContext(Dispatchers.IO) {
                     val geocoder = Geocoder(context, Locale.getDefault())
-                    @Suppress("DEPRECATION")
-                    geocoder.getFromLocation(latitude, longitude, 1)?.firstOrNull()
+                    try {
+                        @Suppress("DEPRECATION")
+                        geocoder.getFromLocation(latitude, longitude, 1)
+                    } catch (e: Exception) {
+                        Log.e("Geocoder", "Geocoding failed for coordinates: $latitude, $longitude", e)
+                        null
+                    }
                 }
 
-                address?.let {
-                    val adminArea = it.adminArea // State
-                    val subAdminArea = it.subAdminArea // District
+                addresses?.firstOrNull()?.let { address ->
+                    val adminArea = address.adminArea // State
+                    val subAdminArea = address.subAdminArea // District
 
                     if (adminArea != null) {
-                        val matchedState = _states.value.find { state -> 
-                            state.equals(adminArea, ignoreCase = true) || 
-                            adminArea.contains(state, ignoreCase = true) 
+                        Log.d("Location", "Geocoded address - State: $adminArea, District: $subAdminArea, Locality: ${address.locality}")
+
+                        // Exact state match first - most reliable
+                        var matchedState = _states.value.find { state ->
+                            state.equals(adminArea, ignoreCase = true)
                         }
-                        
-                        matchedState?.let { s ->
-                            updateState(s)
-                            if (subAdminArea != null) {
-                                // We need to wait for districts to load or use the ones we just fetched if we had them
-                                // For now, we'll try to find it in the current list which might be updated by updateState(s)
-                                // but updateState is async (launches a coroutine).
-                                // Better: fetch districts specifically here if needed.
-                                locationRepository.getDistricts(s).onSuccess { dists ->
-                                    _districts.value = dists
-                                    val matchedDistrict = dists.find { district ->
-                                        district.equals(subAdminArea, ignoreCase = true) ||
-                                        subAdminArea.contains(district, ignoreCase = true)
+
+                        // Fallback to partial match with word boundary consideration
+                        if (matchedState == null) {
+                            Log.d("Location", "No exact state match for '$adminArea', trying partial match")
+                            matchedState = _states.value.find { state ->
+                                val stateWords = state.split(Regex("\\s+"))
+                                val adminWords = adminArea.split(Regex("\\s+"))
+                                // Match if there's a common word (more reliable than simple contains)
+                                stateWords.any { stateWord ->
+                                    adminWords.any { adminWord ->
+                                        stateWord.equals(adminWord, ignoreCase = true)
                                     }
-                                    matchedDistrict?.let { d -> updateDistrict(d) }
                                 }
                             }
                         }
+
+                        // Last fallback: simple contains check
+                        if (matchedState == null) {
+                            Log.d("Location", "No word match for state, trying simple contains")
+                            matchedState = _states.value.find { state ->
+                                adminArea.contains(state, ignoreCase = true) ||
+                                state.contains(adminArea, ignoreCase = true)
+                            }
+                        }
+
+                        // Try address lines as last resort
+                        if (matchedState == null && address.maxAddressLineIndex >= 0) {
+                            Log.d("Location", "Searching in address lines for state match")
+                            for (i in 0..address.maxAddressLineIndex) {
+                                val line = address.getAddressLine(i)
+                                matchedState = _states.value.find { state ->
+                                    line.contains(state, ignoreCase = true)
+                                }
+                                if (matchedState != null) {
+                                    Log.d("Location", "Found state '$matchedState' in address line: $line")
+                                    break
+                                }
+                            }
+                        }
+                        
+                        matchedState?.let { s ->
+                            Log.d("Location", "Matched state: $s")
+                            updateState(s)
+                            fetchWeather(latitude, longitude) // Fetch weather when location is detected
+
+                            if (subAdminArea != null) {
+                                // Wait for districts to load after updateState triggers the async loadDistricts
+                                // Using a delay to allow the district fetch to complete
+                                delay(500)
+
+                                Log.d("Location", "Current districts in state: ${_districts.value}")
+
+                                // Exact district match first
+                                var matchedDistrict = _districts.value.find { district ->
+                                    district.equals(subAdminArea, ignoreCase = true)
+                                }
+
+                                // Partial match with word boundary
+                                if (matchedDistrict == null) {
+                                    Log.d("Location", "No exact district match for '$subAdminArea', trying partial match")
+                                    matchedDistrict = _districts.value.find { district ->
+                                        val districtWords = district.split(Regex("\\s+"))
+                                        val subadminWords = subAdminArea.split(Regex("\\s+"))
+                                        districtWords.any { distWord ->
+                                            subadminWords.any { subWord ->
+                                                distWord.equals(subWord, ignoreCase = true)
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // Simple contains match
+                                if (matchedDistrict == null) {
+                                    Log.d("Location", "No word match for district, trying contains")
+                                    matchedDistrict = _districts.value.find { district ->
+                                        district.contains(subAdminArea, ignoreCase = true) ||
+                                        subAdminArea.contains(district, ignoreCase = true) ||
+                                        address.locality?.contains(district, ignoreCase = true) == true
+                                    }
+                                }
+
+                                matchedDistrict?.let { d ->
+                                    Log.d("Location", "Matched district: $d")
+                                    updateDistrict(d)
+                                } ?: run {
+                                    Log.w("Location", "Could not match district: $subAdminArea. Showing districts for selection.")
+                                }
+                            }
+                        } ?: run {
+                            Log.w("Location", "Could not match any state for adminArea: $adminArea")
+                        }
+                    } else {
+                        Log.w("Location", "Geocoded address has no adminArea (state)")
                     }
+                } ?: run {
+                    Log.w("Location", "Could not geocode location coordinates: $latitude, $longitude")
+                    _uiState.value = AuthUiState.Error("Location found but could not be identified. Please select manually.")
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e("Location", "Unexpected error during updateLocation", e)
+                _uiState.value = AuthUiState.Error("Error processing location: ${e.message}")
             }
         }
     }
@@ -242,19 +354,28 @@ class AuthViewModel @Inject constructor(
 
         _uiState.value = AuthUiState.Loading
         viewModelScope.launch {
-            val result = authRepository.signup(SignupRequest(
-                name = "${form.firstName} ${form.lastName}",
-                phone = form.phone,
-                password = form.password,
-                email = form.email,
-                state = form.state,
-                district = form.district
-            ))
-            result.onSuccess {
-                _signupForm.value = _signupForm.value.copy(otpRequested = true)
-                _uiState.value = AuthUiState.Idle
-            }.onFailure {
-                _uiState.value = AuthUiState.Error(it.message ?: "Failed to request OTP")
+            try {
+                val request = SignupRequest(
+                    name = "${form.firstName} ${form.lastName}",
+                    phone = form.phone,
+                    password = form.password,
+                    email = form.email,
+                    state = form.state,
+                    district = form.district
+                )
+                Log.d("Signup", "Requesting OTP for: ${request.email}")
+                val result = authRepository.signup(request)
+                result.onSuccess {
+                    Log.d("Signup", "OTP requested successfully")
+                    _signupForm.value = _signupForm.value.copy(otpRequested = true)
+                    _uiState.value = AuthUiState.Idle
+                }.onFailure {
+                    Log.e("Signup", "OTP request failed: ${it.message}")
+                    _uiState.value = AuthUiState.Error(it.message ?: "Failed to request OTP")
+                }
+            } catch (e: Exception) {
+                Log.e("Signup", "Unexpected error: ${e.message}")
+                _uiState.value = AuthUiState.Error("An unexpected error occurred: ${e.message}")
             }
         }
     }
@@ -269,21 +390,30 @@ class AuthViewModel @Inject constructor(
 
         _uiState.value = AuthUiState.Loading
         viewModelScope.launch {
-            val result = authRepository.verifyOtp(VerifySignupOtpRequest(
-                phone = form.phone,
-                otp = form.otp,
-                name = "${form.firstName} ${form.lastName}",
-                password = form.password,
-                email = form.email,
-                state = form.state,
-                district = form.district
-            ))
-            result.onSuccess { response ->
-                response.token?.let { tokenManager.saveToken(it) }
-                fetchUserProfile()
-                _uiState.value = AuthUiState.Success
-            }.onFailure {
-                _uiState.value = AuthUiState.Error(it.message ?: "Verification failed")
+            try {
+                val request = VerifySignupOtpRequest(
+                    phone = form.phone,
+                    otp = form.otp,
+                    name = "${form.firstName} ${form.lastName}",
+                    password = form.password,
+                    email = form.email,
+                    state = form.state,
+                    district = form.district
+                )
+                Log.d("Signup", "Verifying OTP for: ${request.email}")
+                val result = authRepository.verifyOtp(request)
+                result.onSuccess { response ->
+                    Log.d("Signup", "OTP verified successfully")
+                    response.token?.let { tokenManager.saveToken(it) }
+                    fetchUserProfile()
+                    _uiState.value = AuthUiState.Success
+                }.onFailure {
+                    Log.e("Signup", "Verification failed: ${it.message}")
+                    _uiState.value = AuthUiState.Error(it.message ?: "Verification failed")
+                }
+            } catch (e: Exception) {
+                Log.e("Signup", "Unexpected verification error: ${e.message}")
+                _uiState.value = AuthUiState.Error("Verification failed: ${e.message}")
             }
         }
     }

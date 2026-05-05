@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.krishimitra.domain.model.WeatherData
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.LeafGreen
 import com.example.krishimitra.ui.theme.LightBeige
@@ -30,7 +31,9 @@ import com.example.krishimitra.ui.Dimensions
 
 @Composable
 fun HomeScreen(
-    userName: String = "Farmer",
+    userName: String,
+    location: String,
+    weather: WeatherData?,
     onNavigateToRecommend: () -> Unit,
     onNavigateToUpload: () -> Unit,
     onNavigateToHistory: () -> Unit,
@@ -54,7 +57,7 @@ fun HomeScreen(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Here's what's happening on your farm today.",
+                    text = "Here's what's happening in $location today.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
@@ -63,7 +66,7 @@ fun HomeScreen(
 
         item {
             // Weather Card
-            WeatherCard()
+            WeatherCard(weather)
         }
 
         item {
@@ -164,7 +167,7 @@ private fun ActionCard(item: QuickActionItem, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun WeatherCard() {
+private fun WeatherCard(weather: WeatherData?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -183,11 +186,16 @@ private fun WeatherCard() {
                 .padding(Dimensions.LARGE)
         ) {
             Column(modifier = Modifier.align(Alignment.CenterStart)) {
-                Text("Sunny Day ☀️", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    weather?.condition ?: "Sunny Day ☀️",
+                    color = Color.White,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
                 Text("Perfect time for farming", color = Color.White.copy(alpha = 0.8f))
             }
             Text(
-                "32°C",
+                if (weather != null) "${weather.temperature.toInt()}°C" else "32°C",
                 modifier = Modifier.align(Alignment.CenterEnd),
                 color = Color.White,
                 fontSize = 40.sp,

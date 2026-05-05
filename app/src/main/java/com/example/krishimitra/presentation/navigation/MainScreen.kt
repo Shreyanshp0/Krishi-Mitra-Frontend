@@ -14,17 +14,21 @@ import com.example.krishimitra.presentation.screens.InsightsScreen
 import com.example.krishimitra.presentation.screens.ProfileScreen
 import com.example.krishimitra.presentation.screens.HistoryScreen
 import com.example.krishimitra.presentation.viewmodel.CropViewModel
+import com.example.krishimitra.presentation.auth.AuthViewModel
 
 @Composable
 internal fun MainScreen(
     navController: NavHostController,
     cropViewModel: CropViewModel,
+    authViewModel: AuthViewModel,
     onLogout: () -> Unit
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: AppRoute.Home.route
     
     val history by cropViewModel.history.collectAsState()
+    val userProfile by authViewModel.userProfile.collectAsState()
+    val weather by authViewModel.weatherState.collectAsState()
 
     val screenTitle = when (currentRoute) {
         AppRoute.Home.route -> "Dashboard"
@@ -33,6 +37,20 @@ internal fun MainScreen(
         AppRoute.Insights.route -> "Insights"
         AppRoute.Profile.route -> "Profile"
         else -> "Krishi Mitra"
+    }
+
+    fun navigateToTopLevel(route: String) {
+        if (currentRoute != route) {
+            navController.navigate(route) {
+                // Standard navigation pattern for bottom nav
+                // Pop up to the "Home" destination to avoid building up a large stack
+                popUpTo(AppRoute.Home.route) {
+                    saveState = true
+                }
+                launchSingleTop = true
+                restoreState = true
+            }
+        }
     }
 
     Scaffold(
@@ -46,17 +64,7 @@ internal fun MainScreen(
         bottomBar = {
             BottomNavBar(
                 currentRoute = currentRoute,
-                onNavigate = { route ->
-                    if (currentRoute != route) {
-                        navController.navigate(route) {
-                            popUpTo(AppRoute.Home.route) { 
-                                saveState = true 
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                }
+                onNavigate = ::navigateToTopLevel
             )
         }
     ) { paddingValues ->
@@ -65,10 +73,13 @@ internal fun MainScreen(
         when (currentRoute) {
             AppRoute.Home.route -> {
                 HomeScreen(
-                    onNavigateToRecommend = { navController.navigate(AppRoute.Recommend.route) },
-                    onNavigateToUpload = { navController.navigate(AppRoute.Upload.route) },
-                    onNavigateToHistory = { navController.navigate(AppRoute.History.route) },
-                    onNavigateToInsights = { navController.navigate(AppRoute.Insights.route) },
+                    userName = userProfile?.name ?: "Farmer",
+                    location = userProfile?.district ?: "your farm",
+                    weather = weather,
+                    onNavigateToRecommend = { navigateToTopLevel(AppRoute.Recommend.route) },
+                    onNavigateToUpload = { navController.navigate(AppRoute.Upload.route) { launchSingleTop = true } },
+                    onNavigateToHistory = { navigateToTopLevel(AppRoute.History.route) },
+                    onNavigateToInsights = { navigateToTopLevel(AppRoute.Insights.route) },
                     modifier = modifier
                 )
             }
@@ -77,7 +88,9 @@ internal fun MainScreen(
                 RecommendScreen(
                     onStart = {
                         cropViewModel.clearResult()
-                        navController.navigate(AppRoute.ModeSelection.route)
+                        navController.navigate(AppRoute.ModeSelection.route) {
+                            launchSingleTop = true
+                        }
                     },
                     modifier = modifier
                 )
@@ -98,6 +111,7 @@ internal fun MainScreen(
 
             AppRoute.Profile.route -> {
                 ProfileScreen(
+                    user = userProfile,
                     onLogout = onLogout,
                     modifier = modifier
                 )

@@ -136,8 +136,8 @@ fun AuthButton(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationSelector(
-    states: List<String>,
-    districtOptions: List<String>,
+    states: List<String>? = emptyList(),
+    districtOptions: List<String>? = emptyList(),
     selectedState: String,
     selectedDistrict: String,
     stateError: String? = null,
@@ -148,6 +148,8 @@ fun LocationSelector(
     isDetectingLocation: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val statesList = states ?: emptyList()
+    val districtsList = districtOptions ?: emptyList()
     var stateExpanded by remember { mutableStateOf(false) }
     var districtExpanded by remember { mutableStateOf(false) }
 
@@ -212,7 +214,7 @@ fun LocationSelector(
                 expanded = stateExpanded,
                 onDismissRequest = { stateExpanded = false }
             ) {
-                states.forEach { state ->
+                statesList.forEach { state ->
                     DropdownMenuItem(
                         text = { Text(state) },
                         onClick = {
@@ -227,7 +229,7 @@ fun LocationSelector(
         // District dropdown
         ExposedDropdownMenuBox(
             expanded = districtExpanded,
-            onExpandedChange = { districtExpanded = it && districtOptions.isNotEmpty() }
+            onExpandedChange = { districtExpanded = it && districtsList.isNotEmpty() }
         ) {
             OutlinedTextField(
                 value = selectedDistrict,
@@ -249,7 +251,7 @@ fun LocationSelector(
                 expanded = districtExpanded,
                 onDismissRequest = { districtExpanded = false }
             ) {
-                districtOptions.forEach { district ->
+                districtsList.forEach { district ->
                     DropdownMenuItem(
                         text = { Text(district) },
                         onClick = {

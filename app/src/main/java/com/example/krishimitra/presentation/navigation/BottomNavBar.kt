@@ -1,7 +1,10 @@
 package com.example.krishimitra.presentation.navigation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
@@ -18,9 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import com.example.krishimitra.ui.theme.DeepGreen
-import com.example.krishimitra.ui.theme.SoilBrown
+import androidx.compose.ui.unit.dp
 import com.example.krishimitra.ui.Dimensions
 
 data class BottomNavItem(
@@ -36,7 +39,7 @@ fun BottomNavBar(
 ) {
     val navItems = listOf(
         BottomNavItem(AppRoute.Home.route, "Home", Icons.Default.Home),
-        BottomNavItem(AppRoute.Recommend.route, "Recommend", Icons.Default.AutoAwesome),
+        BottomNavItem(AppRoute.Recommend.route, "Suggest", Icons.Default.AutoAwesome),
         BottomNavItem(AppRoute.History.route, "History", Icons.Default.History),
         BottomNavItem(AppRoute.Insights.route, "Insights", Icons.Default.Lightbulb),
         BottomNavItem(AppRoute.Profile.route, "Profile", Icons.Default.AccountCircle)
@@ -44,38 +47,44 @@ fun BottomNavBar(
 
     NavigationBar(
         modifier = Modifier
-            .height(Dimensions.TOP_BAR_HEIGHT)
+            .fillMaxWidth()
+            .height(80.dp)
             .background(Color.White),
         containerColor = Color.White,
-        contentColor = DeepGreen
+        contentColor = Color.Green,
+        tonalElevation = 8.dp
     ) {
         navItems.forEach { item ->
             val isSelected = currentRoute == item.route
             NavigationBarItem(
+                modifier = Modifier.fillMaxHeight(),
                 selected = isSelected,
                 onClick = { onNavigate(item.route) },
                 icon = {
                     Icon(
                         imageVector = item.icon,
                         contentDescription = item.label,
-                        tint = if (isSelected) DeepGreen else SoilBrown
+                        modifier = Modifier.size(20.dp),
+                        tint = if (isSelected) Color.Green else Color.Gray
                     )
                 },
                 label = {
                     Text(
                         text = item.label,
-                        fontSize = 11.sp,
+                        fontSize = 10.sp,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isSelected) DeepGreen else SoilBrown,
-                        maxLines = 1
+                        maxLines = 1,
+                        softWrap = false,
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
+                alwaysShowLabel = true,
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = DeepGreen,
-                    selectedTextColor = DeepGreen,
-                    indicatorColor = DeepGreen.copy(alpha = 0.1f),
-                    unselectedIconColor = SoilBrown,
-                    unselectedTextColor = SoilBrown
+                    selectedIconColor = Color.Green,
+                    selectedTextColor = Color.Green,
+                    indicatorColor = Color.Green.copy(alpha = 0.12f),
+                    unselectedIconColor = Color.Gray,
+                    unselectedTextColor = Color.Gray
                 )
             )
         }

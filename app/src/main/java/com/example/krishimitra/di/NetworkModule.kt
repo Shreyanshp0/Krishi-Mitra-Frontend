@@ -4,6 +4,7 @@ import com.example.krishimitra.data.network.api.AuthApi
 import com.example.krishimitra.data.network.api.LocationApi
 import com.example.krishimitra.data.network.api.RecommendApi
 import com.example.krishimitra.data.network.api.ShcApi
+import com.example.krishimitra.data.network.api.WeatherApi
 import com.example.krishimitra.data.network.AuthInterceptor
 import dagger.Module
 import dagger.Provides
@@ -77,5 +78,11 @@ object NetworkModule {
     @Singleton
     fun provideLocationApi(retrofit: Retrofit): LocationApi {
         return retrofit.create(LocationApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWeatherApi(retrofit: Retrofit): WeatherApi {
+        return retrofit.create(WeatherApi::class.java)
     }
 }

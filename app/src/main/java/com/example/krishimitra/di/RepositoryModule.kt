@@ -5,6 +5,7 @@ import com.example.krishimitra.data.network.api.AuthApi
 import com.example.krishimitra.data.network.api.LocationApi
 import com.example.krishimitra.data.network.api.RecommendApi
 import com.example.krishimitra.data.network.api.ShcApi
+import com.example.krishimitra.data.network.api.WeatherApi
 import com.example.krishimitra.data.auth.AuthRepository
 import com.example.krishimitra.data.local.InMemoryHistoryDataSource
 import com.example.krishimitra.data.network.AndroidNetworkMonitor
@@ -12,9 +13,11 @@ import com.example.krishimitra.data.network.NetworkMonitor
 import com.example.krishimitra.data.repository.CropRepositoryImpl
 import com.example.krishimitra.data.repository.LocationRepositoryImpl
 import com.example.krishimitra.data.repository.ShcRepositoryImpl
+import com.example.krishimitra.data.repository.WeatherRepositoryImpl
 import com.example.krishimitra.domain.repository.CropRepository
 import com.example.krishimitra.domain.repository.LocationRepository
 import com.example.krishimitra.domain.repository.ShcRepository
+import com.example.krishimitra.domain.repository.WeatherRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -64,5 +67,11 @@ object RepositoryModule {
     @Singleton
     fun provideShcRepository(shcApi: ShcApi): ShcRepository {
         return ShcRepositoryImpl(shcApi)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWeatherRepository(weatherApi: WeatherApi): WeatherRepository {
+        return WeatherRepositoryImpl(weatherApi)
     }
 }

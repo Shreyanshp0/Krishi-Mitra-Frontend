@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.krishimitra.data.network.api.UserData
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.LightBeige
 import com.example.krishimitra.ui.theme.Red
@@ -41,6 +42,7 @@ import com.example.krishimitra.ui.Dimensions
 
 @Composable
 fun ProfileScreen(
+    user: UserData?,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -57,12 +59,11 @@ fun ProfileScreen(
             verticalArrangement = Arrangement.spacedBy(Dimensions.SECTION_SPACING)
         ) {
             item {
-                // Profile Header
-                ProfileHeader()
+                ProfileHeader(user)
             }
 
             item {
-                ProfileInfoCard()
+                ProfileInfoCard(user)
             }
 
             item {
@@ -70,7 +71,6 @@ fun ProfileScreen(
             }
 
             item {
-                // Settings Section
                 Text(
                     "Settings",
                     style = MaterialTheme.typography.titleMedium,
@@ -100,7 +100,6 @@ fun ProfileScreen(
             }
 
             item {
-                // Account Section
                 Text(
                     "Account",
                     style = MaterialTheme.typography.titleMedium,
@@ -118,7 +117,6 @@ fun ProfileScreen(
             }
         }
 
-        // Logout Button (at bottom)
         Button(
             onClick = onLogout,
             modifier = Modifier
@@ -139,7 +137,7 @@ fun ProfileScreen(
 }
 
 @Composable
-private fun ProfileHeader() {
+private fun ProfileHeader(user: UserData?) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
@@ -153,15 +151,15 @@ private fun ProfileHeader() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)
         ) {
-            // Avatar
             Box(
                 modifier = Modifier
                     .size(80.dp)
                     .background(DeepGreen.copy(alpha = 0.1f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
+                val initials = user?.name?.split(" ")?.take(2)?.mapNotNull { it.firstOrNull() }?.joinToString("") ?: "F"
                 Text(
-                    "JF",
+                    initials,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = DeepGreen
@@ -169,14 +167,14 @@ private fun ProfileHeader() {
             }
 
             Text(
-                "John Farmer",
+                user?.name ?: "Farmer",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = DeepGreen
             )
 
             Text(
-                "farmer@krishimitra.com • Maharashtra",
+                "${user?.email ?: ""} • ${user?.state ?: ""}",
                 style = MaterialTheme.typography.bodySmall,
                 color = SoilBrown,
                 modifier = Modifier.padding(horizontal = Dimensions.MEDIUM)
@@ -193,7 +191,7 @@ private fun ProfileHeader() {
 }
 
 @Composable
-private fun ProfileInfoCard() {
+private fun ProfileInfoCard(user: UserData?) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
@@ -206,13 +204,11 @@ private fun ProfileInfoCard() {
                 .padding(Dimensions.LARGE),
             verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)
         ) {
-            InfoRow(label = "Farm Size", value = "5 acre")
+            InfoRow(label = "Location", value = "${user?.district ?: "N/A"}, ${user?.state ?: "N/A"}")
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f))
-            InfoRow(label = "Location", value = "Pune District")
+            InfoRow(label = "Phone", value = user?.phone ?: "N/A")
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f))
-            InfoRow(label = "Primary Crop", value = "Sugarcane")
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f))
-            InfoRow(label = "Member Since", value = "Jan 2024")
+            InfoRow(label = "User ID", value = user?.id?.takeLast(8) ?: "N/A")
         }
     }
 }

@@ -10,7 +10,7 @@ class LocationRepositoryImpl(
         return try {
             val response = locationApi.getStates()
             if (response.success) {
-                Result.success(response.states)
+                Result.success(response.states ?: emptyList())
             } else {
                 Result.failure(Exception("Failed to fetch states"))
             }
@@ -23,7 +23,7 @@ class LocationRepositoryImpl(
         return try {
             val response = locationApi.getDistricts(state)
             if (response.success) {
-                Result.success(response.districts)
+                Result.success(response.districts ?: emptyList())
             } else {
                 Result.failure(Exception("Failed to fetch districts"))
             }
