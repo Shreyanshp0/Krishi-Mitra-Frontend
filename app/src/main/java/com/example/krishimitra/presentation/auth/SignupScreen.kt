@@ -28,8 +28,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.krishimitra.R
 import com.example.krishimitra.ui.theme.DarkCharcoal
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.LightBeige
@@ -195,7 +197,7 @@ fun SignupScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Create Your Account",
+                text = stringResource(R.string.create_account),
                 style = MaterialTheme.typography.headlineSmall,
                 color = DarkCharcoal,
                 fontWeight = FontWeight.Bold
@@ -208,7 +210,7 @@ fun SignupScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text(
-                        "Basic Details",
+                        stringResource(R.string.basic_details),
                         color = SoilBrown,
                         fontWeight = FontWeight.SemiBold,
                         style = MaterialTheme.typography.titleMedium
@@ -218,7 +220,7 @@ fun SignupScreen(
                     androidx.compose.material3.OutlinedTextField(
                         value = formState.firstName,
                         onValueChange = onFirstNameChange,
-                        label = { Text("First Name") },
+                        label = { Text(stringResource(R.string.first_name)) },
                         singleLine = true,
                         isError = formState.firstNameError != null,
                         supportingText = {
@@ -231,7 +233,7 @@ fun SignupScreen(
                     androidx.compose.material3.OutlinedTextField(
                         value = formState.lastName,
                         onValueChange = onLastNameChange,
-                        label = { Text("Last Name") },
+                        label = { Text(stringResource(R.string.last_name)) },
                         singleLine = true,
                         isError = formState.lastNameError != null,
                         supportingText = {
@@ -254,7 +256,7 @@ fun SignupScreen(
                     androidx.compose.material3.OutlinedTextField(
                         value = formState.phone,
                         onValueChange = onPhoneChange,
-                        label = { Text("Phone Number") },
+                        label = { Text(stringResource(R.string.phone_number)) },
                         singleLine = true,
                         isError = formState.phoneError != null,
                         supportingText = { formState.phoneError?.let { Text(it, color = MaterialTheme.colorScheme.error) } },
@@ -266,7 +268,7 @@ fun SignupScreen(
                     androidx.compose.material3.OutlinedTextField(
                         value = formState.password,
                         onValueChange = onPasswordChange,
-                        label = { Text("Password") },
+                        label = { Text(stringResource(R.string.password)) },
                         singleLine = true,
                         isError = formState.passwordError != null,
                         supportingText = { formState.passwordError?.let { Text(it, color = MaterialTheme.colorScheme.error) } },
@@ -312,14 +314,14 @@ fun SignupScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         Text(
-                            "OTP Verification",
+                            stringResource(R.string.otp_verification),
                             color = SoilBrown,
                             fontWeight = FontWeight.SemiBold,
                             style = MaterialTheme.typography.titleMedium
                         )
 
                         Text(
-                            "Enter the 6-digit OTP sent to ${formState.email}",
+                            stringResource(R.string.enter_otp_msg, formState.email),
                             style = MaterialTheme.typography.bodySmall,
                             color = DarkCharcoal
                         )
@@ -328,7 +330,7 @@ fun SignupScreen(
                             value = formState.otp,
                             onValueChange = onOtpChange,
                             error = formState.otpError,
-                            label = "6-Digit OTP"
+                            label = stringResource(R.string.otp_label)
                         )
                     }
                 }
@@ -336,7 +338,7 @@ fun SignupScreen(
 
             // Action Buttons
             AuthButton(
-                text = if (formState.otpRequested) "Verify OTP & Create Account" else "Send OTP",
+                text = if (formState.otpRequested) stringResource(R.string.verify_create_btn) else stringResource(R.string.send_otp_btn),
                 onClick = if (formState.otpRequested) onVerifyOtpClick else onSendOtpClick,
                 isLoading = uiState is AuthUiState.Loading,
                 modifier = Modifier.padding(top = 8.dp)
@@ -349,7 +351,7 @@ fun SignupScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        "Resend OTP",
+                        stringResource(R.string.resend_otp),
                         color = DeepGreen,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -362,7 +364,7 @@ fun SignupScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    "Already have an account? Login",
+                    stringResource(R.string.already_have_account),
                     color = SoilBrown,
                     fontWeight = FontWeight.SemiBold
                 )

@@ -1,27 +1,14 @@
 package com.example.krishimitra.presentation.auth
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Lock
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -29,15 +16,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.krishimitra.ui.theme.DarkCharcoal
+import com.example.krishimitra.R
+import com.example.krishimitra.ui.Dimensions
 import com.example.krishimitra.ui.theme.DeepGreen
-import com.example.krishimitra.ui.theme.LightBeige
-import com.example.krishimitra.ui.theme.SoilBrown
+import com.example.krishimitra.ui.theme.LeafGreen
 
 @Composable
 fun LoginScreen(
@@ -72,128 +61,144 @@ fun LoginScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = LightBeige
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+                .padding(paddingValues),
+            contentAlignment = Alignment.Center
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // App Logo
-            Box(
+            Column(
                 modifier = Modifier
-                    .height(84.dp)
-                    .fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(Dimensions.LARGE),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
+                // App Logo
                 Box(
                     modifier = Modifier
-                        .background(color = DeepGreen, shape = CircleShape)
-                        .padding(horizontal = 24.dp, vertical = 18.dp)
+                        .size(100.dp)
+                        .background(
+                            brush = Brush.linearGradient(listOf(DeepGreen, LeafGreen)),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "KM", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-                }
-            }
-
-            // Welcome text
-            Text(
-                text = "Welcome Back 👋",
-                style = MaterialTheme.typography.headlineSmall,
-                color = DarkCharcoal,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = "Login with email and password",
-                style = MaterialTheme.typography.bodyMedium,
-                color = SoilBrown,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Login Card
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    EmailInputField(
-                        value = formState.email,
-                        onValueChange = onEmailChange,
-                        error = formState.emailError,
-                        isEnabled = true,
-                        placeholder = "farmer@example.com",
-                        modifier = Modifier
-                            .focusRequester(emailFocusRequester)
-                    )
-
-                    androidx.compose.material3.OutlinedTextField(
-                        value = formState.password,
-                        onValueChange = onPasswordChange,
-                        label = { Text("Password") },
-                        singleLine = true,
-                        isError = formState.passwordError != null,
-                        supportingText = {
-                            formState.passwordError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-                        },
-                        visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    // Remember me
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        androidx.compose.material3.Checkbox(
-                            checked = formState.rememberMe,
-                            onCheckedChange = { onRememberChange(it) },
-                            colors = androidx.compose.material3.CheckboxDefaults.colors(checkedColor = DeepGreen)
-                        )
-                        Spacer(modifier = Modifier.padding(4.dp))
-                        Text(text = "Remember me", color = SoilBrown)
-                    }
-
-                    AuthButton(
-                        text = "Login / Continue",
-                        onClick = onLoginClick,
-                        isLoading = uiState is AuthUiState.Loading,
-                        modifier = Modifier.padding(top = 8.dp)
+                    Text(
+                        text = "KM",
+                        color = Color.White,
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold
                     )
                 }
-            }
 
-            // Sign Up Link
-            TextButton(
-                onClick = onNavigateSignup,
-                modifier = Modifier.padding(top = 8.dp)
-            ) {
+                Spacer(modifier = Modifier.height(Dimensions.LARGE))
+
+                // Welcome text
                 Text(
-                    "New farmer? Create Account",
-                    color = SoilBrown,
-                    fontWeight = FontWeight.SemiBold
+                    text = stringResource(R.string.login_welcome),
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.primary
                 )
+
+                Text(
+                    text = stringResource(R.string.login_instruction),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(Dimensions.EXTRA_LARGE))
+
+                // Login Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(Dimensions.LARGE),
+                        verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)
+                    ) {
+                        EmailInputField(
+                            value = formState.email,
+                            onValueChange = onEmailChange,
+                            error = formState.emailError,
+                            modifier = Modifier.focusRequester(emailFocusRequester)
+                        )
+
+                        OutlinedTextField(
+                            value = formState.password,
+                            onValueChange = onPasswordChange,
+                            label = { Text(stringResource(R.string.password), style = MaterialTheme.typography.bodyMedium) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Outlined.Lock,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            },
+                            singleLine = true,
+                            isError = formState.passwordError != null,
+                            supportingText = {
+                                formState.passwordError?.let {
+                                    Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                                }
+                            },
+                            visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation(),
+                            shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                            )
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Checkbox(
+                                checked = formState.rememberMe,
+                                onCheckedChange = onRememberChange,
+                                colors = CheckboxDefaults.colors(checkedColor = DeepGreen)
+                            )
+                            Text(
+                                text = stringResource(R.string.remember_me),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        AuthButton(
+                            text = stringResource(R.string.login_btn),
+                            onClick = onLoginClick,
+                            isLoading = uiState is AuthUiState.Loading,
+                            modifier = Modifier.padding(top = Dimensions.SMALL)
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(Dimensions.LARGE))
+
+                TextButton(onClick = onNavigateSignup) {
+                    Text(
+                        text = stringResource(R.string.new_farmer_signup),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
+
+
+
             }
-
-            // Debug credentials hint
-            Text(
-                "Test: farmer@example.com + password: PASS11",
-                style = MaterialTheme.typography.bodySmall,
-                color = SoilBrown.copy(alpha = 0.5f),
-                modifier = Modifier.padding(top = 12.dp)
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
-

@@ -1,139 +1,162 @@
 package com.example.krishimitra.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material.icons.outlined.ChevronRight
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.krishimitra.R
 import com.example.krishimitra.data.network.api.UserData
-import com.example.krishimitra.ui.theme.DeepGreen
-import com.example.krishimitra.ui.theme.LightBeige
-import com.example.krishimitra.ui.theme.Red
-import com.example.krishimitra.ui.theme.SoilBrown
+import com.example.krishimitra.ui.theme.*
 import com.example.krishimitra.ui.Dimensions
 
 @Composable
 fun ProfileScreen(
     user: UserData?,
+    currentLanguageCode: String,
+    onLanguageChange: (String) -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(LightBeige)
-    ) {
+    var showLanguageDialog by remember { mutableStateOf(false) }
+
+    if (showLanguageDialog) {
+        LanguageSelectionDialog(
+            currentLanguageCode = currentLanguageCode,
+            onLanguageSelected = {
+                onLanguageChange(it)
+                showLanguageDialog = false
+            },
+            onDismiss = { showLanguageDialog = false }
+        )
+    }
+
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        modifier = Modifier.navigationBarsPadding()
+    ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxSize()
-                .weight(1f)
-                .padding(Dimensions.SCREEN_PADDING),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.SECTION_SPACING)
+                .padding(paddingValues),
+            contentPadding = PaddingValues(Dimensions.SCREEN_PADDING),
+            verticalArrangement = Arrangement.spacedBy(Dimensions.LARGE)
         ) {
             item {
                 ProfileHeader(user)
             }
 
             item {
-                ProfileInfoCard(user)
+                SectionTitle(stringResource(R.string.account))
+                Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column {
+                        SettingItem(
+                            icon = Icons.Default.Edit,
+                            title = stringResource(R.string.edit_profile),
+                            description = stringResource(R.string.update_info)
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = Dimensions.MEDIUM), color = Color.LightGray.copy(alpha = 0.2f))
+                        SettingItem(
+                            icon = Icons.Default.Language,
+                            title = stringResource(R.string.language),
+                            description = getLanguageName(currentLanguageCode),
+                            onClick = { showLanguageDialog = true }
+                        )
+                    }
+                }
             }
 
             item {
-                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                SectionTitle("App & Privacy")
+                Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column {
+                        SettingItem(
+                            icon = Icons.Default.Info,
+                            title = stringResource(R.string.about_app),
+                            description = stringResource(R.string.app_version)
+                        )
+                        HorizontalDivider(modifier = Modifier.padding(horizontal = Dimensions.MEDIUM), color = Color.LightGray.copy(alpha = 0.2f))
+                        SettingItem(
+                            icon = Icons.Default.Shield,
+                            title = "Privacy Policy",
+                            description = "How we protect your data"
+                        )
+                    }
+                }
             }
 
             item {
-                Text(
-                    "Settings",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = DeepGreen
-                )
+                Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
+                Button(
+                    onClick = onLogout,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error.copy(alpha = 0.1f))
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = stringResource(R.string.logout),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
             }
-
-            item {
-                SettingItem(
-                    icon = Icons.Default.Settings,
-                    title = "App Settings",
-                    description = "Language, notifications, units"
-                )
-            }
-
-            item {
-                SettingItem(
-                    icon = Icons.Default.Info,
-                    title = "About Krishi Mitra",
-                    description = "Version 1.0 • Privacy Policy"
-                )
-            }
-
-            item {
-                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
-            }
-
-            item {
-                Text(
-                    "Account",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = DeepGreen
-                )
-            }
-
-            item {
-                SettingItem(
-                    icon = Icons.Default.Edit,
-                    title = "Edit Profile",
-                    description = "Update your information"
-                )
-            }
-        }
-
-        Button(
-            onClick = onLogout,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimensions.SCREEN_PADDING)
-                .padding(bottom = Dimensions.SCREEN_PADDING),
-            shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
-            colors = ButtonDefaults.buttonColors(containerColor = Red)
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Logout,
-                contentDescription = null,
-                modifier = Modifier.padding(end = Dimensions.SMALL)
-            )
-            Text("Logout", fontWeight = FontWeight.Bold)
         }
     }
+}
+
+@Composable
+private fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleSmall,
+        color = Color.Gray,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(start = 4.dp)
+    )
 }
 
 @Composable
@@ -142,95 +165,66 @@ private fun ProfileHeader(user: UserData?) {
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(Dimensions.LARGE),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .background(DeepGreen.copy(alpha = 0.1f), CircleShape),
+                    .size(100.dp)
+                    .background(
+                        brush = Brush.linearGradient(listOf(DeepGreen, LeafGreen)),
+                        shape = CircleShape
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 val initials = user?.name?.split(" ")?.take(2)?.mapNotNull { it.firstOrNull() }?.joinToString("") ?: "F"
                 Text(
-                    initials,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = DeepGreen
+                    text = initials,
+                    style = MaterialTheme.typography.headlineLarge.copy(color = Color.White, fontSize = 36.sp)
                 )
             }
 
+            Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
+
             Text(
-                user?.name ?: "Farmer",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = DeepGreen
+                text = user?.name ?: stringResource(R.string.farmer),
+                style = MaterialTheme.typography.headlineSmall,
+                color = DeepGreen,
+                fontWeight = FontWeight.Bold
             )
 
             Text(
-                "${user?.email ?: ""} • ${user?.state ?: ""}",
-                style = MaterialTheme.typography.bodySmall,
-                color = SoilBrown,
-                modifier = Modifier.padding(horizontal = Dimensions.MEDIUM)
+                text = "${user?.district ?: "N/A"}, ${user?.state ?: "N/A"}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            OutlinedButton(
-                onClick = {},
-                modifier = Modifier.fillMaxWidth()
+            Spacer(modifier = Modifier.height(Dimensions.LARGE))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text("Edit Profile")
+                ProfileStat(label = "Crops", value = "12")
+                VerticalDivider(modifier = Modifier.height(24.dp).align(Alignment.CenterVertically), color = Color.LightGray.copy(alpha = 0.5f))
+                ProfileStat(label = "Queries", value = "48")
+                VerticalDivider(modifier = Modifier.height(24.dp).align(Alignment.CenterVertically), color = Color.LightGray.copy(alpha = 0.5f))
+                ProfileStat(label = "Rank", value = "Expert")
             }
         }
     }
 }
 
 @Composable
-private fun ProfileInfoCard(user: UserData?) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimensions.LARGE),
-            verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)
-        ) {
-            InfoRow(label = "Location", value = "${user?.district ?: "N/A"}, ${user?.state ?: "N/A"}")
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f))
-            InfoRow(label = "Phone", value = user?.phone ?: "N/A")
-            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.2f))
-            InfoRow(label = "User ID", value = user?.id?.takeLast(8) ?: "N/A")
-        }
-    }
-}
-
-@Composable
-private fun InfoRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            label,
-            style = MaterialTheme.typography.bodySmall,
-            color = SoilBrown
-        )
-        Text(
-            value,
-            style = MaterialTheme.typography.bodySmall,
-            fontWeight = FontWeight.Bold,
-            color = DeepGreen
-        )
+private fun ProfileStat(label: String, value: String) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = value, style = MaterialTheme.typography.titleMedium, color = DeepGreen, fontWeight = FontWeight.Bold)
+        Text(text = label, style = MaterialTheme.typography.labelSmall, color = Color.Gray)
     }
 }
 
@@ -238,44 +232,106 @@ private fun InfoRow(label: String, value: String) {
 private fun SettingItem(
     icon: ImageVector,
     title: String,
-    description: String
+    description: String,
+    onClick: () -> Unit = {}
 ) {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = Dimensions.CARD_ELEVATION)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .padding(Dimensions.MEDIUM),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimensions.MEDIUM),
-            horizontalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM),
-            verticalAlignment = Alignment.CenterVertically
+                .size(40.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(DeepGreen.copy(alpha = 0.05f)),
+            contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = DeepGreen,
-                modifier = Modifier.size(Dimensions.ICON_SIZE_MEDIUM)
-            )
-
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(Dimensions.SMALL)
-            ) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = DeepGreen
-                )
-                Text(
-                    description,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = SoilBrown
-                )
-            }
+            Icon(imageVector = icon, contentDescription = null, tint = DeepGreen, modifier = Modifier.size(20.dp))
         }
+
+        Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = description,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        Icon(
+            imageVector = Icons.Outlined.ChevronRight,
+            contentDescription = null,
+            tint = Color.LightGray,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+}
+
+@Composable
+private fun LanguageSelectionDialog(
+    currentLanguageCode: String,
+    onLanguageSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val languages = listOf(
+        Pair("en", "English"),
+        Pair("hi", "हिन्दी"),
+        Pair("pa", "ਪੰਜਾਬੀ"),
+        Pair("te", "తెలుగు")
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.select_language), style = MaterialTheme.typography.titleLarge) },
+        text = {
+            Column {
+                languages.forEach { (code, name) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onLanguageSelected(code) }
+                            .padding(vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = name,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (currentLanguageCode == code) DeepGreen else MaterialTheme.colorScheme.onSurface
+                        )
+                        if (currentLanguageCode == code) {
+                            Icon(Icons.Default.Check, contentDescription = null, tint = DeepGreen)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_LARGE),
+        containerColor = Color.White
+    )
+}
+
+private fun getLanguageName(code: String): String {
+    return when (code) {
+        "hi" -> "हिन्दी"
+        "pa" -> "ਪੰਜਾਬੀ"
+        "te" -> "తెలుగు"
+        else -> "English"
     }
 }

@@ -6,6 +6,7 @@ object Dimensions {
     // Spacing System
     val EXTRA_SMALL = 4.dp
     val SMALL = 8.dp
+    val SMALL_MEDIUM = 12.dp
     val MEDIUM = 16.dp
     val LARGE = 24.dp
     val EXTRA_LARGE = 32.dp
@@ -18,15 +19,15 @@ object Dimensions {
     val SPLASH_ICON_SIZE = 180.dp
 
     val CORNER_RADIUS_SMALL = 8.dp
-    val CORNER_RADIUS_MEDIUM = 12.dp
-    val CORNER_RADIUS_LARGE = 16.dp
+    val CORNER_RADIUS_MEDIUM = 16.dp
+    val CORNER_RADIUS_LARGE = 24.dp
     
     val BUTTON_HEIGHT = 56.dp
     val CARD_HEIGHT = 130.dp
-    val WEATHER_CARD_HEIGHT = 140.dp
+    val WEATHER_CARD_HEIGHT = 160.dp
     val UPLOAD_BOX_HEIGHT = 200.dp
 
-    val CARD_ELEVATION = 2.dp
+    val CARD_ELEVATION = 4.dp
     val NAV_BAR_ELEVATION = 8.dp
     val TOP_BAR_HEIGHT = 64.dp
     val NAV_BAR_HEIGHT = 80.dp

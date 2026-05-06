@@ -4,5 +4,6 @@ data class WeatherData(
     val temperature: Double,
     val condition: String,
     val humidity: Int? = null,
-    val rainfallMm: Double? = null
+    val rainfallMm: Double? = null,
+    val windSpeed: Double? = null
 )

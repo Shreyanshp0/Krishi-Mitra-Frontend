@@ -1,37 +1,29 @@
 package com.example.krishimitra.presentation.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.krishimitra.R
 import com.example.krishimitra.ui.Dimensions
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.LightGreen
 
 data class BottomNavItem(
     val route: String,
-    val label: String,
-    val icon: ImageVector
+    val labelResId: Int,
+    val selectedIcon: ImageVector,
+    val unselectedIcon: ImageVector
 )
 
 @Composable
@@ -40,37 +32,36 @@ fun BottomNavBar(
     onNavigate: (String) -> Unit
 ) {
     val navItems = listOf(
-        BottomNavItem(AppRoute.Home.route, "Home", Icons.Default.Home),
-        BottomNavItem(AppRoute.Recommend.route, "Suggest", Icons.Default.AutoAwesome),
-        BottomNavItem(AppRoute.History.route, "History", Icons.Default.History),
-        BottomNavItem(AppRoute.Insights.route, "Insights", Icons.Default.Lightbulb),
-        BottomNavItem(AppRoute.Profile.route, "Profile", Icons.Default.AccountCircle)
+        BottomNavItem(AppRoute.Home.route, R.string.home, Icons.Filled.Home, Icons.Outlined.Home),
+        BottomNavItem(AppRoute.Recommend.route, R.string.suggest, Icons.Filled.AutoAwesome, Icons.Outlined.AutoAwesome),
+        BottomNavItem(AppRoute.History.route, R.string.history, Icons.Filled.History, Icons.Outlined.History),
+        BottomNavItem(AppRoute.Insights.route, R.string.insights, Icons.Filled.Lightbulb, Icons.Outlined.Lightbulb),
+        BottomNavItem(AppRoute.Profile.route, R.string.profile, Icons.Filled.AccountCircle, Icons.Outlined.AccountCircle)
     )
 
     NavigationBar(
         modifier = Modifier
             .fillMaxWidth()
             .height(Dimensions.NAV_BAR_HEIGHT),
-        containerColor = Color(0xFFF5F5F5), // Light background
-        tonalElevation = Dimensions.NAV_BAR_ELEVATION
+        containerColor = Color.White,
+        tonalElevation = 8.dp
     ) {
         navItems.forEach { item ->
             val isSelected = currentRoute == item.route
             NavigationBarItem(
-                modifier = Modifier.fillMaxHeight(),
                 selected = isSelected,
                 onClick = { onNavigate(item.route) },
                 icon = {
                     Icon(
-                        imageVector = item.icon,
-                        contentDescription = item.label,
+                        imageVector = if (isSelected) item.selectedIcon else item.unselectedIcon,
+                        contentDescription = stringResource(item.labelResId),
                         modifier = Modifier.size(24.dp)
                     )
                 },
                 label = {
                     Text(
-                        text = item.label,
-                        fontSize = 11.sp,
+                        text = stringResource(item.labelResId),
+                        style = MaterialTheme.typography.labelSmall,
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -80,7 +71,7 @@ fun BottomNavBar(
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = DeepGreen,
                     selectedTextColor = DeepGreen,
-                    indicatorColor = LightGreen,
+                    indicatorColor = LightGreen.copy(alpha = 0.5f),
                     unselectedIconColor = Color.Gray,
                     unselectedTextColor = Color.Gray
                 )
@@ -88,4 +79,3 @@ fun BottomNavBar(
         }
     }
 }
-

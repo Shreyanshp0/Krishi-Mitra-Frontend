@@ -12,6 +12,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.krishimitra.domain.model.ChatMessage
 import com.example.krishimitra.domain.model.DomainResult
 import com.example.krishimitra.domain.repository.ChatRepository
+import com.example.krishimitra.data.local.SettingsManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -30,7 +32,8 @@ private val Context.chatDataStore: DataStore<Preferences> by preferencesDataStor
 class ChatViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
     private val gson: Gson,
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val settingsManager: SettingsManager
 ) : ViewModel() {
 
     companion object {
@@ -71,7 +74,8 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val (state, district) = _userLocation.value
-                val result = chatRepository.sendMessage(text, state, district)
+                val lang = settingsManager.languageCode.first()
+                val result = chatRepository.sendMessage(text, state, district, lang)
 
                 when (result) {
                     is DomainResult.Success -> {

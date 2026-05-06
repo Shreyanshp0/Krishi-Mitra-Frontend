@@ -1,39 +1,25 @@
 package com.example.krishimitra.presentation.auth
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.MyLocation
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.outlined.Email
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.krishimitra.ui.Dimensions
 import com.example.krishimitra.ui.theme.DarkCharcoal
 import com.example.krishimitra.ui.theme.DeepGreen
 import com.example.krishimitra.ui.theme.SoilBrown
 
-/**
- * Email input field with validation error display
- */
 @Composable
 fun EmailInputField(
     value: String,
@@ -46,13 +32,13 @@ fun EmailInputField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text("Email") },
-        placeholder = { Text(placeholder) },
+        label = { Text("Email", style = MaterialTheme.typography.bodyMedium) },
+        placeholder = { Text(placeholder, style = MaterialTheme.typography.bodyMedium) },
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Email,
-                contentDescription = "Email",
-                tint = SoilBrown
+                imageVector = Icons.Outlined.Email,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary
             )
         },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
@@ -61,17 +47,18 @@ fun EmailInputField(
         isError = error != null,
         supportingText = {
             error?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.error)
+                Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             }
         },
-        shape = RoundedCornerShape(16.dp),
-        modifier = modifier.fillMaxWidth()
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+        modifier = modifier.fillMaxWidth(),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        )
     )
 }
 
-/**
- * OTP input field (6-digit numeric only)
- */
 @Composable
 fun OtpInputField(
     value: String,
@@ -84,55 +71,63 @@ fun OtpInputField(
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text(label) },
-        placeholder = { Text(placeholder) },
+        label = { Text(label, style = MaterialTheme.typography.bodyMedium) },
+        placeholder = { Text(placeholder, style = MaterialTheme.typography.bodyMedium) },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         singleLine = true,
         isError = error != null,
         supportingText = {
             error?.let {
-                Text(text = it, color = MaterialTheme.colorScheme.error)
+                Text(text = it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
             }
         },
-        shape = RoundedCornerShape(16.dp),
-        modifier = modifier.fillMaxWidth()
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+        modifier = modifier.fillMaxWidth(),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+        )
     )
 }
 
-/**
- * Large action button with optional loading state
- */
 @Composable
 fun AuthButton(
     text: String,
     onClick: () -> Unit,
     isLoading: Boolean = false,
     enabled: Boolean = !isLoading,
-    backgroundColor: Color = DeepGreen,
+    containerColor: Color = DeepGreen,
     modifier: Modifier = Modifier
 ) {
     Button(
         onClick = onClick,
         enabled = enabled,
-        shape = RoundedCornerShape(16.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = backgroundColor),
+        shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            disabledContainerColor = containerColor.copy(alpha = 0.5f)
+        ),
         modifier = modifier
             .fillMaxWidth()
+            .height(56.dp)
     ) {
         if (isLoading) {
-            androidx.compose.material3.CircularProgressIndicator(
+            CircularProgressIndicator(
                 color = Color.White,
-                modifier = Modifier.padding(vertical = 8.dp)
+                strokeWidth = 3.dp,
+                modifier = Modifier.size(24.dp)
             )
         } else {
-            Text(text, fontWeight = FontWeight.Bold, modifier = Modifier.padding(vertical = 8.dp))
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
         }
     }
 }
 
-/**
- * Location selector with auto-detect option
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LocationSelector(
@@ -155,42 +150,47 @@ fun LocationSelector(
 
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)
     ) {
-        // Location header with auto-detect button
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                "Location",
-                color = SoilBrown,
-                fontWeight = FontWeight.SemiBold,
-                style = MaterialTheme.typography.titleMedium
+                text = "Location",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary
             )
             IconButton(
                 onClick = onAutoDetectClick,
                 enabled = !isDetectingLocation
             ) {
-                Icon(
-                    imageVector = Icons.Default.MyLocation,
-                    contentDescription = "Auto-detect location",
-                    tint = DeepGreen,
-                    modifier = Modifier.padding(4.dp)
-                )
+                if (isDetectingLocation) {
+                    CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.MyLocation,
+                        contentDescription = "Auto-detect location",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
 
-        Text(
-            "📍 Tap location icon to auto-detect your state & district",
-            style = MaterialTheme.typography.bodySmall,
-            color = SoilBrown.copy(alpha = 0.7f),
-            modifier = Modifier.padding(start = 2.dp)
-        )
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f),
+            shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_SMALL),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "📍 Tap location icon to auto-detect your location",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(Dimensions.SMALL),
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            )
+        }
 
-        // State dropdown
         ExposedDropdownMenuBox(
             expanded = stateExpanded,
             onExpandedChange = { stateExpanded = it }
@@ -199,16 +199,18 @@ fun LocationSelector(
                 value = selectedState,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("State") },
+                label = { Text("State", style = MaterialTheme.typography.bodyMedium) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = stateExpanded) },
                 isError = stateError != null,
                 supportingText = {
-                    stateError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    stateError?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
                 },
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth()
+                shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+                modifier = Modifier.menuAnchor().fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                )
             )
             ExposedDropdownMenu(
                 expanded = stateExpanded,
@@ -226,7 +228,6 @@ fun LocationSelector(
             }
         }
 
-        // District dropdown
         ExposedDropdownMenuBox(
             expanded = districtExpanded,
             onExpandedChange = { districtExpanded = it && districtsList.isNotEmpty() }
@@ -235,17 +236,19 @@ fun LocationSelector(
                 value = selectedDistrict,
                 onValueChange = {},
                 readOnly = true,
-                label = { Text("District") },
-                placeholder = { Text("Select state first") },
+                label = { Text("District", style = MaterialTheme.typography.bodyMedium) },
+                placeholder = { Text("Select state first", style = MaterialTheme.typography.bodyMedium) },
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = districtExpanded) },
                 isError = districtError != null,
                 supportingText = {
-                    districtError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
+                    districtError?.let { Text(it, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
                 },
-                shape = RoundedCornerShape(16.dp),
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth()
+                shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+                modifier = Modifier.menuAnchor().fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
+                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                )
             )
             ExposedDropdownMenu(
                 expanded = districtExpanded,

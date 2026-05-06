@@ -1,0 +1,198 @@
+<resources>
+    <string name="app_name">ਕ੍ਰਿਸ਼ੀ ਮਿੱਤਰ</string>
+    <string name="welcome">ਜੀ ਆਇਆਂ ਨੂੰ</string>
+    <string name="home">ਹੋਮ</string>
+    <string name="suggest">ਸੁਝਾਅ</string>
+    <string name="history">ਇਤਿਹਾਸ</string>
+    <string name="insights">ਖੇਤੀ ਸਹਾਇਕ</string>
+    <string name="profile">ਪ੍ਰੋਫਾਈਲ</string>
+    <string name="get_recommendation">ਸਿਫਾਰਸ਼ ਪ੍ਰਾਪਤ ਕਰੋ</string>
+    <string name="upload_soil_data">ਮਿੱਟੀ ਦਾ ਡੇਟਾ ਅਪਲੋਡ ਕਰੋ</string>
+    <string name="view_history">ਇਤਿਹਾਸ ਵੇਖੋ</string>
+    <string name="agri_insights">ਖੇਤੀ ਸਹਾਇਕ</string>
+    <string name="daily_tip">ਰੋਜ਼ਾਨਾ ਟਿਪ</string>
+    <string name="logout">ਲੌਗ ਆਉਟ</string>
+    <string name="language">ਭਾਸ਼ਾ</string>
+    <string name="select_language">ਭਾਸ਼ਾ ਚੁਣੋ</string>
+    <string name="confirm_delete">ਮਿਟਾਉਣ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ</string>
+    <string name="clear_all">ਸਭ ਸਾਫ ਕਰੋ</string>
+    <string name="delete">ਮਿਟਾਓ</string>
+    <string name="cancel">ਰੱਦ ਕਰੋ</string>
+    <string name="send">ਭੇਜੋ</string>
+    <string name="typing">ਟਾਈਪਿੰਗ...</string>
+    <string name="ask_placeholder">ਫਸਲਾਂ, ਯੋਜਨਾਵਾਂ ਬਾਰੇ ਪੁੱਛੋ...</string>
+    <string name="quick_questions">ਤੁਰੰਤ ਸਵਾਲ:</string>
+
+    <!-- Home Screen -->
+    <string name="welcome_msg">ਵਾਪਸੀ ਤੇ ਜੀ ਆਇਆਂ ਨੂੰ, %1$s 👋</string>
+    <string name="weather_status">ਅੱਜ %1$s ਵਿੱਚ ਇਹ ਹੋ ਰਿਹਾ ਹੈ।</string>
+    <string name="quick_actions">ਤੁਰੰਤ ਕਾਰਵਾਈਆਂ</string>
+    <string name="sunny_day">ਧੁੱਪ ਵਾਲਾ ਦਿਨ ☀️</string>
+    <string name="farming_time">ਖੇਤੀ ਲਈ ਵਧੀਆ ਸਮਾਂ</string>
+    <string name="daily_tip_content">ਤੁਹਾਡੇ ਖੇਤਰ ਵਿੱਚ ਇਸ ਸੀਜ਼ਨ ਲਈ ਚੌਲ ਸਭ ਤੋਂ ਵਧੀਆ ਹਨ।</string>
+
+    <!-- Profile Screen -->
+    <string name="about_app">ਕ੍ਰਿਸ਼ੀ ਮਿੱਤਰ ਬਾਰੇ</string>
+    <string name="app_version">ਸੰਸਕਰਣ 1.0 • ਪਰਾਈਵੇਸੀ ਪਾਲਿਸੀ</string>
+    <string name="account">ਖਾਤਾ</string>
+    <string name="edit_profile">ਪ੍ਰੋਫਾਈਲ ਸੋਧੋ</string>
+    <string name="update_info">ਆਪਣੀ ਜਾਣਕਾਰੀ ਅਪਡੇਟ ਕਰੋ</string>
+    <string name="location">ਸਥਾਨ</string>
+    <string name="phone">ਫ਼ੋਨ</string>
+    <string name="user_id">ਯੂਜ਼ਰ ਆਈਡੀ</string>
+    <string name="not_available">ਉਪਲਬਧ ਨਹੀਂ</string>
+    <string name="farmer">ਕਿਸਾਨ</string>
+    <string name="your_farm">ਤੁਹਾਡਾ ਖੇਤ</string>
+
+    <!-- Result Screen -->
+    <string name="recommendations_title">ਸਿਫਾਰਸ਼ਾਂ</string>
+    <string name="back_content_desc">ਪਿੱਛੇ</string>
+    <string name="no_data">ਕੋਈ ਡੇਟਾ ਉਪਲਬਧ ਨਹੀਂ ਹੈ।</string>
+    <string name="top_recommendations">🌾 ਚੋਟੀ ਦੀਆਂ ਫਸਲਾਂ ਦੀਆਂ ਸਿਫਾਰਸ਼ਾਂ</string>
+    <string name="based_on_conditions">ਤੁਹਾਡੀ ਮਿੱਟੀ ਅਤੇ ਮੌਸਮ ਦੀਆਂ ਸਥਿਤੀਆਂ ਦੇ ਅਧਾਰ ਤੇ</string>
+    <string name="offline_cached">📡 ਆਫਲਾਈਨ: ਕੈਸ਼ ਕੀਤਾ ਨਤੀਜਾ ਦਿਖਾ ਰਿਹਾ ਹੈ</string>
+    <string name="new_recommendation">🔄 ਨਵੀਂ ਸਿਫਾਰਸ਼</string>
+    <string name="view_history_btn">📋 ਇਤਿਹਾਸ ਵੇਖੋ</string>
+    <string name="high_confidence">ਉੱਚ ਭਰੋਸਾ ✅</string>
+    <string name="medium_confidence">ਮੱਧਮ ਭਰੋਸਾ ⚠️</string>
+    <string name="low_confidence">ਘੱਟ ਭਰੋਸਾ ❌</string>
+    <string name="confidence_label">ਭਰੋਸਾ: %1$d%%</string>
+
+    <!-- Mode Selection -->
+    <string name="select_mode_title">ਮੋਡ ਚੁਣੋ</string>
+    <string name="how_to_provide">ਤੁਸੀਂ ਆਪਣੀ ਮਿੱਟੀ ਦੇ ਵੇਰਵੇ ਕਿਵੇਂ ਦੇਣਾ ਚਾਹੋਗੇ?</string>
+    <string name="choose_method">ਉਹ ਤਰੀਕਾ ਚੁਣੋ ਜੋ ਤੁਹਾਡੇ ਲਈ ਸਭ ਤੋਂ ਵਧੀਆ ਹੈ</string>
+    <string name="upload_shc_title">📄 ਮਿੱਟੀ ਸਿਹਤ ਕਾਰਡ ਅਪਲੋਡ ਕਰੋ</string>
+    <string name="upload_shc_desc">ਮਿੱਟੀ ਦਾ ਡੇਟਾ ਆਪਣੇ ਆਪ ਕੱਢਣ ਲਈ ਆਪਣਾ SHC ਦਸਤਾਵੇਜ਼ ਅਪਲੋਡ ਕਰੋ</string>
+    <string name="manual_entry_title">✍️ ਵੇਰਵੇ ਖੁਦ ਦਰਜ ਕਰੋ</string>
+    <string name="manual_entry_desc">ਆਪਣੀ ਮਿੱਟੀ ਅਤੇ ਖੇਤੀ ਦੇ ਵੇਰਵੇ ਕਦਮ-ਦਰ-ਕਦਮ ਭਰੋ</string>
+
+    <!-- History Screen -->
+    <string name="recent">ਹਾਲ ਹੀ ਦੇ</string>
+    <string name="archived">ਪੁਰਾਲੇਖ</string>
+    <string name="delete_all_confirm">ਕੀ ਤੁਸੀਂ ਸਾਰਾ ਸਿਫਾਰਸ਼ ਇਤਿਹਾਸ ਮਿਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ? ਇਹ ਵਾਪਸ ਨਹੀਂ ਲਿਆ ਜਾ ਸਕਦਾ।</string>
+    <string name="no_records">ਕੋਈ ਰਿਕਾਰਡ ਨਹੀਂ ਮਿਲਿਆ।</string>
+    <string name="delete_record_confirm">ਕੀ ਤੁਸੀਂ ਇਸ ਰਿਕਾਰਡ ਨੂੰ ਮਿਟਾਉਣਾ ਚਾਹੁੰਦੇ ਹੋ?</string>
+    <string name="tap_for_details">ਵੇਰਵੇ ਵੇਖਣ ਲਈ ਟੈਪ ਕਰੋ</string>
+    <string name="match_label">%1$d%% ਮੇਲ</string>
+    <string name="soil_season_format">%1$s ਮਿੱਟੀ • %2$s ਸੀਜ਼ਨ</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_welcome">ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! 👋</string>
+    <string name="chat_intro">ਮੈਂ ਤੁਹਾਡਾ ਖੇਤੀ ਸਹਾਇਕ ਹਾਂ। ਮੈਨੂੰ ਫਸਲਾਂ, ਖੇਤੀ ਦੇ ਸੁਝਾਅ, ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ ਅਤੇ ਹੋਰ ਬਹੁਤ ਕੁਝ ਬਾਰੇ ਪੁੱਛੋ!</string>
+    <string name="suggestion_best_crop">ਮੇਰੀ ਮਿੱਟੀ ਲਈ ਸਭ ਤੋਂ ਵਧੀਆ ਫਸਲ?</string>
+    <string name="suggestion_prevent_pests">ਕੀੜਿਆਂ ਨੂੰ ਕਿਵੇਂ ਰੋਕਿਆ ਜਾਵੇ?</string>
+    <string name="suggestion_govt_schemes">ਉਪਲਬਧ ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ</string>
+    <string name="suggestion_water_conservation">ਪਾਣੀ ਦੀ ਸੰਭਾਲ ਦੇ ਸੁਝਾਅ</string>
+
+    <!-- Input Form Screen -->
+    <string name="form_title">ਕਿਸਾਨ ਇਨਪੁਟ ਫਾਰਮ</string>
+    <string name="section_basics">📍 ਸੈਕਸ਼ਨ 1: ਖੇਤੀ ਦੀਆਂ ਮੂਲ ਗੱਲਾਂ</string>
+    <string name="season_label">ਸੀਜ਼ਨ (ਲੋੜੀਂਦਾ)</string>
+    <string name="farm_size_label">ਖੇਤ ਦਾ ਆਕਾਰ (ਲੋੜੀਂਦਾ)</string>
+    <string name="section_soil">🌱 ਸੈਕਸ਼ਨ 2: ਮਿੱਟੀ ਦੇ ਵੇਰਵੇ</string>
+    <string name="soil_type_label">ਮਿੱਟੀ ਦੀ ਕਿਸਮ (ਲੋੜੀਂਦੀ)</string>
+    <string name="soil_fertility_label">ਮਿੱਟੀ ਦੀ ਉਪਜਾਊ ਸ਼ਕਤੀ (ਲੋੜੀਂਦੀ)</string>
+    <string name="section_water">💧 ਸੈਕਸ਼ਨ 3: ਪਾਣੀ ਅਤੇ ਸਿੰਚਾਈ</string>
+    <string name="water_avail_label">ਪਾਣੀ ਦੀ ਉਪਲਬਧਤਾ (ਲੋੜੀਂਦੀ)</string>
+    <string name="irrigation_src_label">सिंचाई का स्रोत (ਲੋੜੀਂਦਾ)</string>
+    <string name="section_prefs">🎯 ਸੈਕਸ਼ਨ 4: ਤਰਜੀਹਾਂ</string>
+    <string name="farmer_priority_label">ਕਿਸਾਨ ਦੀ ਤਰਜੀਹ (ਲੋੜੀਂਦੀ)</string>
+    <string name="prev_crop_label">ਪਿਛਲੀ ਫਸਲ (ਵਿਕਲਪਿਕ)</string>
+    <string name="get_recommendation_btn">ਸਿਫਾਰਸ਼ ਪ੍ਰਾਪਤ ਕਰੋ 🌾</string>
+
+    <!-- Upload Screen -->
+    <string name="shc_title">ਮਿੱਟੀ ਸਿਹਤ ਕਾਰਡ</string>
+    <string name="upload_shc_instruction">ਵੇਰਵੇ ਆਪਣੇ ਆਪ ਭਰਨ ਲਈ ਆਪਣਾ ਮਿੱਟੀ ਸਿਹਤ ਕਾਰਡ (SHC) ਅਪਲੋਡ ਕਰੋ।</string>
+    <string name="analyze_btn">ਮਿੱਟੀ ਦੇ ਡੇਟਾ ਦਾ ਵਿਸ਼ਲੇਸ਼ਣ ਕਰੋ</string>
+    <string name="reading_data">ਤੁਹਾਡੀ ਮਿੱਟੀ ਦਾ ਡੇਟਾ ਪੜ੍ਹ ਰਿਹਾ ਹਾਂ...</string>
+    <string name="take_few_seconds">ਇਸ ਵਿੱਚ ਕੁਝ ਸਕਿੰਟ ਲੱਗ ਸਕਦੇ ਹਨ</string>
+    <string name="extracted_data_title">✨ ਕੱਢਿਆ ਗਿਆ ਮਿੱਟੀ ਦਾ ਡੇਟਾ</string>
+    <string name="save_data_btn">ਮਿੱਟੀ ਦਾ ਡੇਟਾ ਸੇਵ ਕਰੋ</string>
+    <string name="fill_manually_btn">ਜਾਂ ਵੇਰਵੇ ਖੁਦ ਭਰੋ</string>
+    <string name="upload_box_title">ਮਿੱਟੀ ਸਿਹਤ ਕਾਰਡ ਅਪਲੋਡ ਕਰੋ</string>
+    <string name="supported_formats">ਸਮਰਥਿਤ: ਚਿੱਤਰ ਜਾਂ ਪੀਡੀਐਫ</string>
+    <string name="choose_file_btn">ਫਾਈਲ ਚੁਣੋ</string>
+    <string name="ready_to_analyze">ਵਿਸ਼ਲੇਸ਼ਣ ਲਈ ਤਿਆਰ</string>
+    <string name="retry">ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ</string>
+
+    <!-- Auth Screens -->
+    <string name="login_welcome">ਵਾਪਸੀ ਤੇ ਜੀ ਆਇਆਂ ਨੂੰ 👋</string>
+    <string name="login_instruction">ਈਮੇਲ ਅਤੇ ਪਾਸਵਰਡ ਨਾਲ ਲੌਗਇਨ ਕਰੋ</string>
+    <string name="password">ਪਾਸਵਰਡ</string>
+    <string name="remember_me">ਮੈਨੂੰ ਯਾਦ ਰੱਖੋ</string>
+    <string name="login_btn">ਲੌਗਇਨ / ਜਾਰੀ ਰੱਖੋ</string>
+    <string name="new_farmer_signup">ਨਵੇਂ ਕਿਸਾਨ? ਖਾਤਾ ਬਣਾਓ</string>
+    <string name="create_account">ਆਪਣਾ ਖਾਤਾ ਬਣਾਓ</string>
+    <string name="basic_details">ਮੂਲ ਵੇਰਵੇ</string>
+    <string name="first_name">ਪਹਿਲਾ ਨਾਮ</string>
+    <string name="last_name">ਆਖਰੀ ਨਾਮ</string>
+    <string name="phone_number">ਫ਼ੋਨ ਨੰਬਰ</string>
+    <string name="otp_verification">ਓਟੀਪੀ ਦੀ ਪੁਸ਼ਟੀ</string>
+    <string name="enter_otp_msg">%1$s ਤੇ ਭੇਜਿਆ ਗਿਆ 6-ਅੰਕਾਂ ਵਾਲਾ ਓਟੀਪੀ ਦਰਜ ਕਰੋ</string>
+    <string name="otp_label">6-ਅੰਕਾਂ ਵਾਲਾ ਓਟੀਪੀ</string>
+    <string name="verify_create_btn">ਓਟੀਪੀ ਦੀ ਪੁਸ਼ਟੀ ਕਰੋ ਅਤੇ ਖਾਤਾ ਬਣਾਓ</string>
+    <string name="send_otp_btn">ਓਟੀਪੀ ਭੇਜੋ</string>
+    <string name="resend_otp">ਓਟੀਪੀ ਦੁਬਾਰਾ ਭੇਜੋ</string>
+    <string name="already_have_account">ਪਹਿਲਾਂ ਹੀ ਖਾਤਾ ਹੈ? ਲੌਗਇਨ ਕਰੋ</string>
+
+    <!-- Form Options -->
+    <string name="opt_kharif">ਖਰੀਫ</string>
+    <string name="opt_rabi">ਰਬੀ</string>
+    <string name="opt_zaid">ਜ਼ੈਦ</string>
+    <string name="opt_annual">ਸਾਲਾਨਾ</string>
+
+    <string name="opt_small">ਛੋਟਾ</string>
+    <string name="opt_medium">ਦਰਮਿਆਨਾ</string>
+    <string name="opt_large">ਵੱਡਾ</string>
+
+    <string name="opt_alluvial">ਜਲੋੜ</string>
+    <string name="opt_black">ਕਾਲੀ</string>
+    <string name="opt_red">ਲਾਲ</string>
+    <string name="opt_laterite">ਲੈਟਰਾਈਟ</string>
+    <string name="opt_arid">ਖੁਸ਼ਕ</string>
+    <string name="opt_forest">ਜੰਗਲ</string>
+    <string name="opt_other">ਹੋਰ</string>
+
+    <string name="opt_low">ਘੱਟ</string>
+    <string name="opt_high">ਉੱਚਾ</string>
+
+    <string name="opt_tube_well">ਟਿਊਬਵੈੱਲ</string>
+    <string name="opt_rainfed">ਬਾਰਿਸ਼ ਤੇ ਨਿਰਭਰ</string>
+    <string name="opt_canal">ਨਹਿਰ</string>
+    <string name="opt_tank">ਟੈਂਕ</string>
+
+    <string name="opt_profit">ਮੁਨਾਫ਼ਾ</string>
+    <string name="opt_yield">ਪੈਦਾਵਾਰ</string>
+    <string name="opt_low_maint">ਘੱਟ ਦੇਖਭਾਲ</string>
+    <string name="opt_drought_res">ਸੋਕਾ ਰੋਧਕ</string>
+
+    <!-- Soil Labels -->
+    <string name="label_nitrogen">ਨਾਈਟ੍ਰੋਜਨ (N)</string>
+    <string name="label_phosphorus">ਫਾਸਫੋਰਸ (P)</string>
+    <string name="label_potassium">ਪੋਟਾਸ਼ੀਅਮ (K)</string>
+    <string name="label_soil_ph">ਮਿੱਟੀ ਦਾ pH</string>
+
+    <!-- Errors -->
+    <string name="err_location_required">ਕਿਰਪਾ ਕਰਕੇ ਯਕੀਨੀ ਬਣਾਓ ਕਿ ਪ੍ਰੋਫਾਈਲ ਜਾਂ ਸਾਈਨਅਪ ਦੌਰਾਨ ਸਥਾਨ (ਰਾਜ/ਜ਼ਿਲ੍ਹਾ) ਚੁਣਿਆ ਗਿਆ ਹੈ</string>
+    <string name="err_first_name_req">ਪਹਿਲਾ ਨਾਮ ਲੋੜੀਂਦਾ ਹੈ</string>
+    <string name="err_last_name_req">ਆਖਰੀ ਨਾਮ ਲੋੜੀਂਦਾ ਹੈ</string>
+    <string name="err_email_req">ਈਮੇਲ ਲੋੜੀਂਦੀ ਹੈ</string>
+    <string name="err_email_invalid">ਇੱਕ ਵੈਧ ਈਮੇਲ ਦਰਜ ਕਰੋ</string>
+    <string name="err_phone_len">ਫ਼ੋਨ 10 ਅੰਕਾਂ ਦਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ</string>
+    <string name="err_password_len">ਪਾਸਵਰਡ ਘੱਟੋ-ਘੱਟ 6 ਅੱਖਰਾਂ ਦਾ ਹੋਣਾ ਚਾਹੀਦਾ ਹੈ</string>
+    <string name="err_state_req">ਕਿਰਪਾ ਕਰਕੇ ਰਾਜ ਚੁਣੋ</string>
+    <string name="err_district_req">ਕਿਰਪਾ ਕਰਕੇ ਜ਼ਿਲ੍ਹਾ ਚੁਣੋ</string>
+    <string name="err_otp_len">6-ਅੰਕਾਂ ਵਾਲਾ ਓਟੀਪੀ ਦਰਜ ਕਰੋ</string>
+    <string name="err_login_failed">ਲੌਗਇਨ ਅਸਫਲ ਰਿਹਾ</string>
+    <string name="err_otp_req_failed">ਓਟੀਪੀ ਦੀ ਬੇਨਤੀ ਅਸਫਲ ਰਹੀ</string>
+    <string name="err_verify_failed">ਪੁਸ਼ਟੀਕਰਨ ਅਸਫਲ ਰਿਹਾ</string>
+
+    <!-- Recommend Screen -->
+    <string name="recommend_title">ਫਸਲ ਦੀਆਂ ਸਿਫਾਰਸ਼ਾਂ ਪ੍ਰਾਪਤ ਕਰੋ</string>
+    <string name="recommend_description">ਆਪਣੀ ਮਿੱਟੀ ਦੇ ਵੇਰਵੇ ਭਰੋ ਅਤੇ ਆਪਣੇ ਸਥਾਨ ਅਤੇ ਸਥਿਤੀਆਂ ਦੇ ਅਧਾਰ ਤੇ ਵਿਅਕਤੀਗਤ ਫਸਲ ਦੀਆਂ ਸਿਫਾਰਸ਼ਾਂ ਪ੍ਰਾਪਤ ਕਰੋ।</string>
+    <string name="start_recommendation_btn">ਫਸਲ ਦੀ ਸਿਫਾਰਸ਼ ਸ਼ੁਰੂ ਕਰੋ</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_tagline">ਫਸਲ ਸਿਫਾਰਸ਼ ਸਹਾਇਕ</string>
+</resources>

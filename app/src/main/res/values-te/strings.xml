@@ -1,0 +1,198 @@
+<resources>
+    <string name="app_name">కృషి మిత్ర</string>
+    <string name="welcome">స్వాగతం</string>
+    <string name="home">హోమ్</string>
+    <string name="suggest">సూచన</string>
+    <string name="history">చరిత్ర</string>
+    <string name="insights">వ్యవసాయ సహాయకుడు</string>
+    <string name="profile">ప్రొఫైల్</string>
+    <string name="get_recommendation">సిఫార్సు పొందండి</string>
+    <string name="upload_soil_data">మట్టి డేటాను అప్‌లోడ్ చేయండి</string>
+    <string name="view_history">చరిత్రను చూడండి</string>
+    <string name="agri_insights">వ్యవసాయ సహాయకుడు</string>
+    <string name="daily_tip">రోజువారీ చిట్కా</string>
+    <string name="logout">లాగ్ అవుట్</string>
+    <string name="language">భాష</string>
+    <string name="select_language">భాషను ఎంచుకోండి</string>
+    <string name="confirm_delete">తొలగింపును ధృవీకరించండి</string>
+    <string name="clear_all">అన్నీ క్లియర్ చేయండి</string>
+    <string name="delete">తొలగించు</string>
+    <string name="cancel">రద్దు చేయండి</string>
+    <string name="send">పంపండి</string>
+    <string name="typing">టైపింగ్...</string>
+    <string name="ask_placeholder">పంటలు, పథకాల గురించి అడగండి...</string>
+    <string name="quick_questions">త్వరిత ప్రశ్నలు:</string>
+
+    <!-- Home Screen -->
+    <string name="welcome_msg">తిరిగి స్వాగతం, %1$s 👋</string>
+    <string name="weather_status">ఈరోజు %1$sలో ఏమి జరుగుతుందో ఇక్కడ ఉంది.</string>
+    <string name="quick_actions">త్వరిత చర్యలు</string>
+    <string name="sunny_day">ఎండ రోజు ☀️</string>
+    <string name="farming_time">వ్యవసాయానికి సరైన సమయం</string>
+    <string name="daily_tip_content">మీ ప్రాంతంలో ఈ సీజన్‌కు వరి ఉత్తమంగా సరిపోతుంది.</string>
+
+    <!-- Profile Screen -->
+    <string name="about_app">కృషి మిత్ర గురించి</string>
+    <string name="app_version">వెర్షన్ 1.0 • గోప్యతా విధానం</string>
+    <string name="account">ఖాతా</string>
+    <string name="edit_profile">ప్రొఫైల్ సవరించండి</string>
+    <string name="update_info">మీ సమాచారాన్ని అప్‌డేట్ చేయండి</string>
+    <string name="location">స్థానం</string>
+    <string name="phone">ఫోన్</string>
+    <string name="user_id">యూజర్ ఐడి</string>
+    <string name="not_available">అందుబాటులో లేదు</string>
+    <string name="farmer">రైతు</string>
+    <string name="your_farm">మీ పొలం</string>
+
+    <!-- Result Screen -->
+    <string name="recommendations_title">సిఫార్సులు</string>
+    <string name="back_content_desc">వెనుకకు</string>
+    <string name="no_data">డేటా అందుబాటులో లేదు.</string>
+    <string name="top_recommendations">🌾 అగ్ర పంట సిఫార్సులు</string>
+    <string name="based_on_conditions">మీ మట్టి మరియు వాతావరణ పరిస్థితుల ఆధారంగా</string>
+    <string name="offline_cached">📡 ఆఫ్‌లైన్: కాష్ చేసిన ఫలితాన్ని చూపుతోంది</string>
+    <string name="new_recommendation">🔄 కొత్త సిఫార్సు</string>
+    <string name="view_history_btn">📋 చరిత్రను చూడండి</string>
+    <string name="high_confidence">అధిక విశ్వాసం ✅</string>
+    <string name="medium_confidence">మధ్యస్థ విశ్వాసం ⚠️</string>
+    <string name="low_confidence">తక్కువ విశ్వాసం ❌</string>
+    <string name="confidence_label">విశ్వాసం: %1$d%%</string>
+
+    <!-- Mode Selection -->
+    <string name="select_mode_title">మోడ్‌ని ఎంచుకోండి</string>
+    <string name="how_to_provide">మీరు మీ మట్టి వివరాలను ఎలా అందించాలనుకుంటున్నారు?</string>
+    <string name="choose_method">మీకు బాగా సరిపోయే పద్ధతిని ఎంచుకోండి</string>
+    <string name="upload_shc_title">📄 నేల ఆరోగ్య కార్డును అప్‌లోడ్ చేయండి</string>
+    <string name="upload_shc_desc">మట్టి డేటాను స్వయంచాలకంగా సంగ్రహించడానికి మీ SHC పత్రాన్ని అప్‌లోడ్ చేయండి</string>
+    <string name="manual_entry_title">✍️ వివరాలను మాన్యువల్‌గా నమోదు చేయండి</string>
+    <string name="manual_entry_desc">మీ మట్టి మరియు వ్యవసాయ వివరాలను దశలవారీగా పూరించండి</string>
+
+    <!-- History Screen -->
+    <string name="recent">ఇటీవలి</string>
+    <string name="archived">ఆర్కైవ్ చేయబడింది</string>
+    <string name="delete_all_confirm">మీరు ఖచ్చితంగా అన్ని సిఫార్సుల చరిత్రను తొలగించాలనుకుంటున్నారా? ఇది రద్దు చేయబడదు.</string>
+    <string name="no_records">రికార్డులు ఏవీ కనుగొనబడలేదు.</string>
+    <string name="delete_record_confirm">మీరు ఖచ్చితంగా ఈ రికార్డును తొలగించాలనుకుంటున్నారా?्</string>
+    <string name="tap_for_details">వివరాలను చూడటానికి నొక్కండి</string>
+    <string name="match_label">%1$d%% సరిపోలిక</string>
+    <string name="soil_season_format">%1$s నేల • %2$s సీజన్</string>
+
+    <!-- Chat Screen -->
+    <string name="chat_welcome">హలో! 👋</string>
+    <string name="chat_intro">నేను మీ వ్యవసాయ సహాయకుడిని. పంటలు, వ్యవసాయ చిట్కాలు, ప్రభుత్వ పథకాలు మరియు మరిన్నింటి గురించి నన్ను అడగండి!</string>
+    <string name="suggestion_best_crop">నా మట్టికి ఏ పంట ఉత్తమం?</string>
+    <string name="suggestion_prevent_pests">తెగుళ్లను ఎలా నివారించాలి?</string>
+    <string name="suggestion_govt_schemes">అందుబాటులో ఉన్న ప్రభుత్వ పథకాలు</string>
+    <string name="suggestion_water_conservation">నీటి సంరక్షణ చిట్కాలు</string>
+
+    <!-- Input Form Screen -->
+    <string name="form_title">రైతు ఇన్పుట్ ఫారం</string>
+    <string name="section_basics">📍 విభాగం 1: వ్యవసాయ ప్రాథమిక అంశాలు</string>
+    <string name="season_label">సీజన్ (తప్పనిసరి)</string>
+    <string name="farm_size_label">పొలం పరిమాణం (తప్పనిసరి)</string>
+    <string name="section_soil">🌱 విభాగం 2: మట్టి వివరాలు</string>
+    <string name="soil_type_label">నేల రకం (తప్పనిసరి)</string>
+    <string name="soil_fertility_label">నేల సారవంతం (తప్పనిసరి)</string>
+    <string name="section_water">💧 విభాగం 3: నీరు మరియు నీటి పారుదల</string>
+    <string name="water_avail_label">నీటి లభ్యత (తప్పనిసరి)</string>
+    <string name="irrigation_src_label">నీటి పారుదల మూలం (తప్పనిసరి)</string>
+    <string name="section_prefs">🎯 విభాగం 4: ప్రాధాన్యతలు</string>
+    <string name="farmer_priority_label">రైతు ప్రాధాన్యత (తప్పనిసరి)</string>
+    <string name="prev_crop_label">మునుపటి పంట (ఐచ్ఛికం)</string>
+    <string name="get_recommendation_btn">సిఫార్సు పొందండి 🌾</string>
+
+    <!-- Upload Screen -->
+    <string name="shc_title">నేల ఆరోగ్య కార్డు</string>
+    <string name="upload_shc_instruction">వివరాలను స్వయంచాలకంగా పూరించడానికి మీ నేల ఆరోగ్య కార్డును (SHC) అప్‌లోడ్ చేయండి।</string>
+    <string name="analyze_btn">మట్టి డేటాను విశ్లేషించండి</string>
+    <string name="reading_data">మీ మట్టి డేటాను చదువుతున్నాను...</string>
+    <string name="take_few_seconds">దీనికి కొన్ని సెకన్లు పట్టవచ్చు</string>
+    <string name="extracted_data_title">✨ సంగ్రహించిన మట్టి డేటా</string>
+    <string name="save_data_btn">మట్టి డేటాను సేవ్ చేయండి</string>
+    <string name="fill_manually_btn">లేదా వివరాలను మాన్యువల్‌గా పూరించండి</string>
+    <string name="upload_box_title">నేల ఆరోగ్య కార్డును అప్‌లోడ్ చేయండి</string>
+    <string name="supported_formats">మద్దతు ఉన్నవి: చిత్రం లేదా PDF</string>
+    <string name="choose_file_btn">ఫైల్‌ని ఎంచుకోండి</string>
+    <string name="ready_to_analyze">విశ్లేషణకు సిద్ధంగా ఉంది</string>
+    <string name="retry">మళ్ళీ ప్రయత్నించండి</string>
+
+    <!-- Auth Screens -->
+    <string name="login_welcome">తిరిగి స్వాగతం 👋</string>
+    <string name="login_instruction">ఈమెయిల్ మరియు పాస్‌వర్డ్‌తో లాగిన్ చేయండి</string>
+    <string name="password">పాస్‌వర్డ్</string>
+    <string name="remember_me">నన్ను గుర్తుంచుకో</string>
+    <string name="login_btn">లాగిన్ / కొనసాగించు</string>
+    <string name="new_farmer_signup">కొత్త రైతు? ఖాతాను సృష్టించండి</string>
+    <string name="create_account">మీ ఖాతాను సృష్టించండి</string>
+    <string name="basic_details">ప్రాథమిక వివరాలు</string>
+    <string name="first_name">మొదటి పేరు</string>
+    <string name="last_name">చివరి పేరు</string>
+    <string name="phone_number">ఫోన్ నంబర్</string>
+    <string name="otp_verification">OTP ధృవీకరణ</string>
+    <string name="enter_otp_msg">%1$sకి పంపిన 6-అంకెల OTPని నమోదు చేయండి</string>
+    <string name="otp_label">6-అంకెల OTP</string>
+    <string name="verify_create_btn">OTPని ధృవీకరించండి &amp; ఖాతాను సృష్టించండి</string>
+    <string name="send_otp_btn">OTP పంపండి</string>
+    <string name="resend_otp">OTPని మళ్లీ పంపండి</string>
+    <string name="already_have_account">ఇప్పటికే ఖాతా ఉందా? లాగిన్ చేయండి</string>
+
+    <!-- Form Options -->
+    <string name="opt_kharif">ఖరీఫ్</string>
+    <string name="opt_rabi">రబీ</string>
+    <string name="opt_zaid">జైద్</string>
+    <string name="opt_annual">వార్షిక</string>
+
+    <string name="opt_small">చిన్న</string>
+    <string name="opt_medium">మధ్యస్థ</string>
+    <string name="opt_large">పెద్ద</string>
+
+    <string name="opt_alluvial">అల్యూవియల్</string>
+    <string name="opt_black">నల్ల</string>
+    <string name="opt_red">ఎర్ర</string>
+    <string name="opt_laterite">లాటరైట్</string>
+    <string name="opt_arid">శుష్క</string>
+    <string name="opt_forest">అటవీ</string>
+    <string name="opt_other">ఇతర</string>
+
+    <string name="opt_low">తక్కువ</string>
+    <string name="opt_high">అధిక</string>
+
+    <string name="opt_tube_well">బోరు బావి</string>
+    <string name="opt_rainfed">వర్షాధార</string>
+    <string name="opt_canal">కాలువ</string>
+    <string name="opt_tank">చెరువు</string>
+
+    <string name="opt_profit">లాభం</string>
+    <string name="opt_yield">దిగుబడి</string>
+    <string name="opt_low_maint">తక్కువ నిర్వహణ</string>
+    <string name="opt_drought_res">కరువు నిరోధక</string>
+
+    <!-- Soil Labels -->
+    <string name="label_nitrogen">నత్రజని (N)</string>
+    <string name="label_phosphorus">భాస్వరం (P)</string>
+    <string name="label_potassium">పొటాషియం (K)</string>
+    <string name="label_soil_ph">నేల pH</string>
+
+    <!-- Errors -->
+    <string name="err_location_required">దయచేసి ప్రొఫైల్ లేదా సైన్అప్ సమయంలో స్థానం (రాష్ట్రం/జిల్లా) ఎంపిక చేయబడిందని నిర్ధారించుకోండి</string>
+    <string name="err_first_name_req">మొదటి పేరు తప్పనిసరి</string>
+    <string name="err_last_name_req">చివరి పేరు తప్పనిసరి</string>
+    <string name="err_email_req">ఇమెయిల్ తప్పనిసరి</string>
+    <string name="err_email_invalid">చెల్లుబాటు అయ్యే ఇమెయిల్‌ను నమోదు చేయండి</string>
+    <string name="err_phone_len">ఫోన్ 10 అంకెలు ఉండాలి</string>
+    <string name="err_password_len">పాస్‌వర్డ్ కనీసం 6 అక్షరాలు ఉండాలి</string>
+    <string name="err_state_req">దయచేసి రాష్ట్రాన్ని ఎంచుకోండి</string>
+    <string name="err_district_req">దయచేసి జిల్లాను ఎంచుకోండి</string>
+    <string name="err_otp_len">6-అంకెల OTPని నమోదు చేయండి</string>
+    <string name="err_login_failed">లాగిన్ విఫలమైంది</string>
+    <string name="err_otp_req_failed">OTP అభ్యర్థన విఫలమైంది</string>
+    <string name="err_verify_failed">ధృవీకరణ విఫలమైంది</string>
+
+    <!-- Recommend Screen -->
+    <string name="recommend_title">పంట సిఫార్సులను పొందండి</string>
+    <string name="recommend_description">మీ నేల వివరాలను పూరించండి మరియు మీ స్థానం మరియు పరిస్థితుల ఆధారంగా వ్యక్తిగతీకరించిన పంట సిఫార్సులను పొందండి.</string>
+    <string name="start_recommendation_btn">పంట సిఫార్సును ప్రారంభించండి</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_tagline">పంట సిఫార్సు సహాయకుడు</string>
+</resources>

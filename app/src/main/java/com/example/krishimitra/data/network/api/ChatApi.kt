@@ -12,7 +12,8 @@ interface ChatApi {
 data class ChatRequest(
     val message: String,
     val location: String = "", // e.g., "Maharashtra"
-    val district: String = "" // e.g., "Pune"
+    val district: String = "", // e.g., "Pune"
+    val language: String = "en"
 )
 
 data class ChatResponse(

@@ -1,49 +1,34 @@
 package com.example.krishimitra.presentation.screens
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.krishimitra.R
 import com.example.krishimitra.presentation.viewmodel.ChatViewModel
-import com.example.krishimitra.ui.theme.DeepGreen
-import com.example.krishimitra.ui.theme.LightBeige
-import com.example.krishimitra.ui.theme.LightGreen
+import com.example.krishimitra.ui.theme.*
 import com.example.krishimitra.ui.Dimensions
 
 @Composable
@@ -58,198 +43,257 @@ fun ChatScreen(
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
 
-    // Auto-scroll to bottom when new messages arrive
     LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
             listState.animateScrollToItem(messages.size - 1)
         }
     }
 
-    // Set user location for context
     LaunchedEffect(userState, userDistrict) {
         if (userState.isNotEmpty() || userDistrict.isNotEmpty()) {
             viewModel.setUserLocation(userState, userDistrict)
         }
     }
 
-    // Show initial suggestions if no messages
     val showSuggestions = messages.isEmpty()
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(LightBeige)
+            .background(MaterialTheme.colorScheme.background)
+            .imePadding()
     ) {
+        // Chat Header
+        Surface(
+            color = Color.White,
+            tonalElevation = 2.dp
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimensions.MEDIUM),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(DeepGreen.copy(alpha = 0.1f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = DeepGreen, modifier = Modifier.size(20.dp))
+                }
+                Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
+                Column {
+                    Text(
+                        text = stringResource(R.string.insights),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = DeepGreen
+                    )
+                    Text(
+                        text = if (isLoading) stringResource(R.string.typing) else "Online",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = if (isLoading) DeepGreen else Color.Gray
+                    )
+                }
+            }
+        }
+
         // Chat messages area
         Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
         ) {
-            if (messages.isEmpty() && !showSuggestions) {
-                // Empty state
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(Dimensions.SCREEN_PADDING),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        "Hello! 👋",
-                        modifier = Modifier.padding(Dimensions.MEDIUM),
-                        textAlign = TextAlign.Center
-                    )
-                    Text(
-                        "I'm your Agri Assistant. Ask me about crops, farming tips, government schemes, and more!",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(Dimensions.MEDIUM)
-                    )
-                }
+            if (messages.isEmpty()) {
+                WelcomeView()
             } else {
                 LazyColumn(
                     state = listState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(Dimensions.SCREEN_PADDING),
-                    verticalArrangement = Arrangement.spacedBy(Dimensions.SMALL),
-                    reverseLayout = false
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(Dimensions.SCREEN_PADDING),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.MEDIUM)
                 ) {
                     items(messages) { message ->
-                        if (message.isUser) {
-                            UserBubble(message.text)
-                        } else {
-                            BotBubble(message.text)
-                        }
+                        ChatBubble(message.text, message.isUser)
                     }
 
-                    // Loading indicator
                     if (isLoading) {
                         item {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = DeepGreen,
-                                    strokeWidth = 2.dp
-                                )
-                                Spacer(modifier = Modifier.width(Dimensions.SMALL))
-                                Text("Typing...", color = DeepGreen)
-                            }
+                            TypingIndicator()
                         }
                     }
                 }
             }
         }
 
-        // Quick suggestions or input area
-        if (showSuggestions && messages.isEmpty()) {
-            QuickSuggestions(
-                suggestions = listOf(
-                    "Best crop for my soil?",
-                    "How to prevent pests?",
-                    "Government schemes available",
-                    "Water conservation tips"
-                ),
-                onSuggestionClick = { suggestion ->
-                    viewModel.sendMessage(suggestion)
-                },
+        // Bottom area: Suggestions + Input
+        Surface(
+            color = Color.White,
+            tonalElevation = 4.dp,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(Dimensions.SCREEN_PADDING)
+                    .padding(Dimensions.MEDIUM)
+                    .padding(bottom = 8.dp)
+            ) {
+                AnimatedVisibility(visible = showSuggestions) {
+                    QuickSuggestions(
+                        suggestions = listOf(
+                            stringResource(R.string.suggestion_best_crop),
+                            stringResource(R.string.suggestion_prevent_pests),
+                            stringResource(R.string.suggestion_govt_schemes)
+                        ),
+                        onSuggestionClick = { viewModel.sendMessage(it) }
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(Dimensions.SMALL))
+                
+                InputArea(
+                    inputText = inputText,
+                    onInputChange = { inputText = it },
+                    onSendClick = {
+                        if (inputText.isNotBlank()) {
+                            viewModel.sendMessage(inputText)
+                            inputText = ""
+                        }
+                    },
+                    isEnabled = !isLoading
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WelcomeView() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(Dimensions.EXTRA_LARGE),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.AutoAwesome,
+            contentDescription = null,
+            modifier = Modifier.size(80.dp),
+            tint = DeepGreen.copy(alpha = 0.1f)
+        )
+        Spacer(modifier = Modifier.height(Dimensions.LARGE))
+        Text(
+            text = stringResource(R.string.chat_welcome),
+            style = MaterialTheme.typography.headlineSmall,
+            color = DeepGreen,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(Dimensions.SMALL))
+        Text(
+            text = stringResource(R.string.chat_intro),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun ChatBubble(text: String, isUser: Boolean) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
+        verticalAlignment = Alignment.Bottom
+    ) {
+        if (!isUser) {
+            Avatar(Icons.Default.AutoAwesome, DeepGreen)
+            Spacer(modifier = Modifier.width(8.dp))
+        }
+        
+        Surface(
+            color = if (isUser) DeepGreen else LightGreen.copy(alpha = 0.3f),
+            shape = RoundedCornerShape(
+                topStart = 20.dp,
+                topEnd = 20.dp,
+                bottomStart = if (isUser) 20.dp else 4.dp,
+                bottomEnd = if (isUser) 4.dp else 20.dp
+            ),
+            tonalElevation = if (isUser) 0.dp else 1.dp,
+            modifier = Modifier.widthIn(max = 280.dp)
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 22.sp),
+                color = if (isUser) Color.White else Color.Black
             )
         }
 
-        // Input area
-        InputArea(
-            inputText = inputText,
-            onInputChange = { inputText = it },
-            onSendClick = {
-                if (inputText.isNotBlank()) {
-                    viewModel.sendMessage(inputText)
-                    inputText = ""
-                }
-            },
-            isEnabled = !isLoading,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimensions.SCREEN_PADDING)
-        )
+        if (isUser) {
+            Spacer(modifier = Modifier.width(8.dp))
+            Avatar(Icons.Default.Person, SoilBrown)
+        }
     }
 }
 
 @Composable
-private fun UserBubble(text: String) {
+private fun Avatar(icon: androidx.compose.ui.graphics.vector.ImageVector, color: Color) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = Dimensions.SMALL),
-        contentAlignment = Alignment.CenterEnd
+            .size(32.dp)
+            .clip(CircleShape)
+            .background(color.copy(alpha = 0.1f)),
+        contentAlignment = Alignment.Center
     ) {
-        Text(
-            text = text,
-            modifier = Modifier
-                .background(DeepGreen, RoundedCornerShape(12.dp))
-                .padding(Dimensions.MEDIUM)
-                .fillMaxWidth(0.8f),
-            color = Color.White,
-            maxLines = Int.MAX_VALUE,
-            overflow = TextOverflow.Ellipsis
-        )
+        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(16.dp))
     }
 }
 
 @Composable
-private fun BotBubble(text: String) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = Dimensions.SMALL),
-        contentAlignment = Alignment.CenterStart
+private fun TypingIndicator() {
+    Row(
+        modifier = Modifier.padding(start = 40.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = text,
-            modifier = Modifier
-                .background(LightGreen, RoundedCornerShape(12.dp))
-                .padding(Dimensions.MEDIUM)
-                .fillMaxWidth(0.8f),
-            color = Color.Black,
-            maxLines = Int.MAX_VALUE,
-            overflow = TextOverflow.Ellipsis
-        )
+        Surface(
+            color = LightGreen.copy(alpha = 0.3f),
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Row(modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
+                Text(
+                    text = stringResource(R.string.typing),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = DeepGreen
+                )
+            }
+        }
     }
 }
 
 @Composable
 private fun QuickSuggestions(
     suggestions: List<String>,
-    onSuggestionClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onSuggestionClick: (String) -> Unit
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(Dimensions.SMALL)
-    ) {
+    Column(verticalArrangement = Arrangement.spacedBy(Dimensions.SMALL)) {
         Text(
-            "Quick Questions:",
-            modifier = Modifier.padding(bottom = Dimensions.SMALL)
+            text = stringResource(R.string.quick_questions),
+            style = MaterialTheme.typography.labelMedium,
+            color = Color.Gray,
+            modifier = Modifier.padding(start = 4.dp)
         )
-        suggestions.forEach { suggestion ->
-            Button(
-                onClick = { onSuggestionClick(suggestion) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp),
-                shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_SMALL),
-                colors = ButtonDefaults.buttonColors(containerColor = LightGreen)
-            ) {
-                Text(
-                    suggestion,
-                    color = Color.Black,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(Dimensions.SMALL)
+        ) {
+            suggestions.forEach { suggestion ->
+                AssistChip(
+                    onClick = { onSuggestionClick(suggestion) },
+                    label = { Text(suggestion, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                    shape = CircleShape,
+                    colors = AssistChipDefaults.assistChipColors(containerColor = LightGreen.copy(alpha = 0.2f))
                 )
             }
         }
@@ -261,23 +305,30 @@ private fun InputArea(
     inputText: String,
     onInputChange: (String) -> Unit,
     onSendClick: () -> Unit,
-    isEnabled: Boolean,
-    modifier: Modifier = Modifier
+    isEnabled: Boolean
 ) {
     Row(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(Dimensions.SMALL),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(Dimensions.SMALL)
     ) {
+        IconButton(onClick = { /* Voice Input Placeholder */ }) {
+            Icon(Icons.Default.Mic, contentDescription = null, tint = Color.Gray)
+        }
+        
         OutlinedTextField(
             value = inputText,
-            onValueChange = { if (it.length <= 200) onInputChange(it) },
-            modifier = Modifier
-                .weight(1f)
-                .height(50.dp),
-            placeholder = { Text("Ask about crops, schemes...") },
+            onValueChange = onInputChange,
+            modifier = Modifier.weight(1f),
+            placeholder = { Text(stringResource(R.string.ask_placeholder), style = MaterialTheme.typography.bodyMedium) },
+            shape = CircleShape,
             singleLine = true,
-            shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = DeepGreen,
+                unfocusedBorderColor = Color.LightGray.copy(alpha = 0.5f),
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f),
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.2f)
+            ),
             enabled = isEnabled
         )
 
@@ -286,18 +337,15 @@ private fun InputArea(
             enabled = isEnabled && inputText.isNotBlank(),
             modifier = Modifier
                 .size(48.dp)
-                .clip(RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM))
-                .background(if (isEnabled && inputText.isNotBlank()) DeepGreen else Color.LightGray.copy(alpha = 0.5f))
+                .clip(CircleShape)
+                .background(if (isEnabled && inputText.isNotBlank()) DeepGreen else Color.LightGray.copy(alpha = 0.2f))
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Send,
-                contentDescription = "Send",
-                tint = Color.White
+                contentDescription = null,
+                tint = Color.White,
+                modifier = Modifier.size(20.dp)
             )
         }
     }
 }
-
-
-
-

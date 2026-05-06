@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.krishimitra.R
 import com.example.krishimitra.ui.theme.DeepGreen
@@ -48,13 +49,13 @@ fun SplashScreen(onTimeout: () -> Unit) {
         Spacer(modifier = Modifier.height(Dimensions.LARGE))
 
         Text(
-            text = "Krishi Mitra",
+            text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
             color = DeepGreen
         )
         Text(
-            text = "Crop Recommendation Assistant",
+            text = stringResource(R.string.splash_tagline),
             style = MaterialTheme.typography.bodyLarge
         )
         

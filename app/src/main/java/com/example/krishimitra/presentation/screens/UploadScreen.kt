@@ -24,12 +24,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.krishimitra.R
 import com.example.krishimitra.presentation.viewmodel.ExtractedSoilData
 import com.example.krishimitra.presentation.viewmodel.SHCUploadUiState
 import com.example.krishimitra.presentation.viewmodel.SHCUploadViewModel
@@ -58,10 +60,10 @@ fun UploadScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Soil Health Card", color = Color.White, fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.shc_title), color = Color.White, fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back_content_desc), tint = Color.White)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = DeepGreen)
@@ -79,7 +81,7 @@ fun UploadScreen(
         ) {
             item {
                 Text(
-                    text = "Upload your Soil Health Card (SHC) to automatically fill in details.",
+                    text = stringResource(R.string.upload_shc_instruction),
                     style = MaterialTheme.typography.bodyMedium,
                     color = DarkCharcoal,
                     textAlign = TextAlign.Center,
@@ -126,7 +128,7 @@ fun UploadScreen(
                     ) {
                         Icon(Icons.Default.AutoFixHigh, contentDescription = null)
                         Spacer(modifier = Modifier.width(Dimensions.SMALL))
-                        Text("Analyze Soil Data", fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.analyze_btn), fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -161,7 +163,7 @@ fun UploadScreen(
             // Footer
             item {
                 TextButton(onClick = onNavigateToForm) {
-                    Text("Or Fill Details Manually", color = SoilBrown, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.fill_manually_btn), color = SoilBrown, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -192,13 +194,13 @@ fun UploadBox(onUploadClick: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
             Text(
-                "Upload Soil Health Card",
+                stringResource(R.string.upload_box_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = DeepGreen,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                "Supported: Image or PDF",
+                stringResource(R.string.supported_formats),
                 style = MaterialTheme.typography.bodySmall,
                 color = Color.Gray
             )
@@ -208,7 +210,7 @@ fun UploadBox(onUploadClick: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = DeepGreen.copy(alpha = 0.1f)),
                 shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM)
             ) {
-                Text("Choose File", color = DeepGreen, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.choose_file_btn), color = DeepGreen, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -231,7 +233,7 @@ fun FilePreviewCard(fileName: String, onRemove: () -> Unit) {
             Spacer(modifier = Modifier.width(Dimensions.MEDIUM))
             Column(modifier = Modifier.weight(1f)) {
                 Text(fileName, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text("Ready to analyze", style = MaterialTheme.typography.bodySmall, color = LeafGreen)
+                Text(stringResource(R.string.ready_to_analyze), style = MaterialTheme.typography.bodySmall, color = LeafGreen)
             }
             IconButton(onClick = onRemove) {
                 Icon(Icons.Default.Close, contentDescription = "Remove", tint = Color.Red)
@@ -250,8 +252,8 @@ fun ProcessingState() {
     ) {
         CircularProgressIndicator(color = DeepGreen)
         Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
-        Text("Reading your soil data...", fontWeight = FontWeight.Medium, color = DeepGreen)
-        Text("This may take a few seconds", style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+        Text(stringResource(R.string.reading_data), fontWeight = FontWeight.Medium, color = DeepGreen)
+        Text(stringResource(R.string.take_few_seconds), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
     }
 }
 
@@ -264,17 +266,17 @@ fun ExtractedDataCard(data: ExtractedSoilData, onSave: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(Dimensions.MEDIUM)) {
             Text(
-                "✨ Extracted Soil Data",
+                stringResource(R.string.extracted_data_title),
                 style = MaterialTheme.typography.titleMedium,
                 color = DeepGreen,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(Dimensions.MEDIUM))
 
-            SoilDataItem(label = "Nitrogen (N)", value = data.nitrogen, icon = Icons.Default.Science)
-            SoilDataItem(label = "Phosphorus (P)", value = data.phosphorus, icon = Icons.Default.Science)
-            SoilDataItem(label = "Potassium (K)", value = data.potassium, icon = Icons.Default.Science)
-            SoilDataItem(label = "Soil pH", value = data.ph, icon = Icons.Default.WaterDrop)
+            SoilDataItem(label = stringResource(R.string.label_nitrogen), value = data.nitrogen, icon = Icons.Default.Science)
+            SoilDataItem(label = stringResource(R.string.label_phosphorus), value = data.phosphorus, icon = Icons.Default.Science)
+            SoilDataItem(label = stringResource(R.string.label_potassium), value = data.potassium, icon = Icons.Default.Science)
+            SoilDataItem(label = stringResource(R.string.label_soil_ph), value = data.ph, icon = Icons.Default.WaterDrop)
 
             Spacer(modifier = Modifier.height(Dimensions.EXTRA_LARGE))
 
@@ -284,7 +286,7 @@ fun ExtractedDataCard(data: ExtractedSoilData, onSave: () -> Unit) {
                 shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_MEDIUM),
                 colors = ButtonDefaults.buttonColors(containerColor = DeepGreen)
             ) {
-                Text("Save Soil Data", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.save_data_btn), fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -292,6 +294,13 @@ fun ExtractedDataCard(data: ExtractedSoilData, onSave: () -> Unit) {
 
 @Composable
 fun SoilDataItem(label: String, value: String, icon: ImageVector) {
+    val displayValue = when (value.lowercase()) {
+        "low" -> stringResource(R.string.opt_low)
+        "medium" -> stringResource(R.string.opt_medium)
+        "high" -> stringResource(R.string.opt_high)
+        else -> value
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -315,7 +324,7 @@ fun SoilDataItem(label: String, value: String, icon: ImageVector) {
             shape = RoundedCornerShape(Dimensions.CORNER_RADIUS_SMALL)
         ) {
             Text(
-                text = value,
+                text = displayValue,
                 modifier = Modifier.padding(horizontal = Dimensions.SMALL, vertical = Dimensions.EXTRA_SMALL),
                 color = if (value.contains("Low", true)) SoilAccent else DeepGreen,
                 fontWeight = FontWeight.Bold,
@@ -350,7 +359,7 @@ fun ErrorStateView(message: String, onRetry: () -> Unit) {
                 colors = ButtonDefaults.buttonColors(containerColor = Red),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text("Retry")
+                Text(stringResource(R.string.retry))
             }
         }
     }

@@ -25,8 +25,11 @@ class CropRepositoryImpl(
     private var cachedResult: RecommendationResult? = null
     private val repositoryScope = CoroutineScope(Dispatchers.IO)
 
-    override suspend fun getRecommendations(input: CropInput): DomainResult<RecommendationResult> {
+    private var lastLanguage: String = "en"
+
+    override suspend fun getRecommendations(input: CropInput, language: String): DomainResult<RecommendationResult> {
         lastInput = input
+        lastLanguage = language
 
         if (!networkMonitor.isOnline()) {
             return cachedResult?.let {
@@ -35,7 +38,7 @@ class CropRepositoryImpl(
         }
 
         return try {
-            val response = api.getRecommendations(input.toDto())
+            val response = api.getRecommendations(input.toDto().copy(language = language))
             
             // Extract recommendations from the nested data structure
             val recommendationsList = response.data?.recommendations
@@ -64,7 +67,7 @@ class CropRepositoryImpl(
 
     override suspend fun retryLastRequest(): DomainResult<RecommendationResult> {
         val input = lastInput ?: return DomainResult.Error("No previous request to retry.")
-        return getRecommendations(input)
+        return getRecommendations(input, lastLanguage)
     }
 
     override suspend fun deleteHistoryItem(id: Long) {

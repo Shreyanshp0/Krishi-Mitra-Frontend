@@ -12,12 +12,14 @@ import com.example.krishimitra.domain.usecase.GetHistoryUseCase
 import com.example.krishimitra.domain.usecase.RetryRecommendationUseCase
 import com.example.krishimitra.domain.usecase.DeleteHistoryUseCase
 import com.example.krishimitra.domain.usecase.ClearHistoryUseCase
+import com.example.krishimitra.data.local.SettingsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,7 +29,8 @@ class CropViewModel @Inject constructor(
     getHistoryUseCase: GetHistoryUseCase,
     private val retryRecommendationUseCase: RetryRecommendationUseCase,
     private val deleteHistoryUseCase: DeleteHistoryUseCase,
-    private val clearHistoryUseCase: ClearHistoryUseCase
+    private val clearHistoryUseCase: ClearHistoryUseCase,
+    private val settingsManager: SettingsManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<CropUiState>(CropUiState.Idle)
@@ -89,23 +92,22 @@ class CropViewModel @Inject constructor(
             return false
         }
 
-        val input = CropInput(
-            mode = "manual",
-            state = location.state,
-            district = location.district,
-            soilType = form.soilType,
-            season = form.season,
-            additionalInputs = mapOf(
-                "fertility" to form.soilFertility,
-                "waterAvailability" to form.waterAvailability,
-                "irrigationSource" to form.irrigationSource,
-                "farmSize" to form.farmSize,
-                "farmerPriority" to form.priority,
-                "previousCrop" to form.previousCrop
+        viewModelScope.launch {
+            val lang = settingsManager.languageCode.first()
+            val input = CropInput(
+                mode = "manual",
+                language = lang,
+                state = location.state,
+                district = location.district,
+                soilType = form.soilType,
+                season = form.season,
+                soilFertility = form.soilFertility,
+                waterAvailability = form.waterAvailability,
+                irrigationSource = form.irrigationSource,
+                priority = form.priority
             )
-        )
-
-        fetchRecommendation(input)
+            fetchRecommendation(input)
+        }
         return true
     }
 
@@ -116,14 +118,20 @@ class CropViewModel @Inject constructor(
             return false
         }
 
-        val input = CropInput(
-            mode = "shc",
-            state = location.state,
-            district = location.district,
-            additionalInputs = soilData
-        )
-
-        fetchRecommendation(input)
+        viewModelScope.launch {
+            val lang = settingsManager.languageCode.first()
+            val input = CropInput(
+                mode = "shc",
+                language = lang,
+                state = location.state,
+                district = location.district,
+                nitrogen = soilData["nitrogen"]?.toString(),
+                phosphorus = soilData["phosphorus"]?.toString(),
+                potassium = soilData["potassium"]?.toString(),
+                ph = soilData["ph"]?.toString()
+            )
+            fetchRecommendation(input)
+        }
         return true
     }
 
@@ -161,7 +169,7 @@ class CropViewModel @Inject constructor(
         _uiState.value = CropUiState.Loading
         viewModelScope.launch {
             Log.d("API_REQUEST", "Sending recommendation request for mode: ${input.mode}")
-            when (val result = getCropRecommendationUseCase(input)) {
+            when (val result = getCropRecommendationUseCase(input, input.language)) {
                 is DomainResult.Success -> {
                     Log.d("API_RESPONSE", "Recommendation received successfully")
                     _uiState.value = CropUiState.Success(result.data)

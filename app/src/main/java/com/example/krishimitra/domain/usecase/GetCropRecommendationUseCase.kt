@@ -7,6 +7,6 @@ import javax.inject.Inject
 class GetCropRecommendationUseCase @Inject constructor(
     private val repository: CropRepository
 ) {
-    suspend operator fun invoke(input: CropInput) = repository.getRecommendations(input)
+    suspend operator fun invoke(input: CropInput, language: String) = repository.getRecommendations(input, language)
 }
 

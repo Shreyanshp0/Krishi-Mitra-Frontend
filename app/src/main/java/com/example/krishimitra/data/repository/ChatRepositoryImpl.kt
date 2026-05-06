@@ -10,13 +10,14 @@ class ChatRepositoryImpl @Inject constructor(
     private val chatApi: ChatApi
 ) : ChatRepository {
 
-    override suspend fun sendMessage(message: String, state: String, district: String): DomainResult<String> {
+    override suspend fun sendMessage(message: String, state: String, district: String, language: String): DomainResult<String> {
         return try {
             val response = chatApi.sendMessage(
                 ChatRequest(
                     message = message,
                     location = state,
-                    district = district
+                    district = district,
+                    language = language
                 )
             )
             

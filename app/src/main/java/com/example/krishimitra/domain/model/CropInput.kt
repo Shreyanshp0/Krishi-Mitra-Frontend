@@ -2,15 +2,17 @@ package com.example.krishimitra.domain.model
 
 data class CropInput(
     val mode: String = "manual",
+    val language: String = "en",
     val state: String = "",
     val district: String = "",
-    val soilType: String = "",
-    val season: String = "",
-    val nitrogen: Int? = null,
-    val phosphorus: Int? = null,
-    val potassium: Int? = null,
-    val ph: Double? = null,
-    val temperature: Int? = null,
-    val rainfall: Int? = null,
-    val additionalInputs: Map<String, Any?> = emptyMap()
+    val season: String? = null,
+    val soilType: String? = null,
+    val soilFertility: String? = null,
+    val waterAvailability: String? = null,
+    val irrigationSource: String? = null,
+    val priority: String? = null,
+    val nitrogen: String? = null,
+    val phosphorus: String? = null,
+    val potassium: String? = null,
+    val ph: String? = null
 )
